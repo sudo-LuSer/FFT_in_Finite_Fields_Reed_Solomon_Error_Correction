@@ -1,11 +1,8 @@
 #ifndef RS_TOOLS_H
 #define RS_TOOLS_H
 
-#include <vector>
-#include <cstdint>
-#include <stdexcept>
-
-using namespace std;
+#include <bits/stdc++.h>
+using namespace std; 
 
 const uint32_t poly_masks[21] = {
     0,          // m=0 (non utilisé)
@@ -32,27 +29,47 @@ const uint32_t poly_masks[21] = {
 };
 
 class GaloisField {
-private:
-    int m;              // Degree of the field 
-    int size;           // ordre des éléments : 2^m
-    int prim_poly;      // Polynôme primitif P(X)
-    vector<int> alpha_to; // hash_map: alpha^i -> polynomial form
-    vector<int> index_of; // hash_map : logarithme discret polynomial form -> exponent i
-    
-public:
-    GaloisField(int m);
-    
-    int mul(int a, int b);
-    int div(int a, int b);
-    int add(int a, int b);
-    int sub(int a, int b);
-    int pow_gf(int a, int n);
+    private:
+        int m;              // Degree of the field 
+        int size;           // ordre des elements : 2^m
+        int prim_poly;      // Polynome primitive P(X)
+        vector<int> alpha_to; // hash_map: alpha^i -> polynomial form
+        vector<int> index_of; // hash_map : logarithme discret polynomial form -> exponent i
+        
+    public:
+        GaloisField(int m) : m(m), prim_poly(poly_masks[m]) {
+            size = 1 << m;
+            alpha_to.resize(size);
+            index_of.resize(size);
 
-    const vector<int>& get_alpha_to() const;
-    const vector<int>& get_index_of() const;
-    int get_size() const;
-    int get_m() const;
-    int get_prim_poly() const;
-};
+            // 1. Initialize tables
+            alpha_to[0] = 1; // alpha^0 = 1
+            index_of[0] = -INT_MAX; // log(0) is undefined
+
+            // construction de Corps de Galois 
+            int val = 1;
+            for (int i = 0; i < size - 1; i++) {
+                alpha_to[i] = val;
+                index_of[val] = i;
+                val <<= 1;
+                // If we exceed the degree of the primitive polynomial we go forward by calculating modulo P(alpha) 
+                if (val & size) {
+                    val ^= prim_poly;
+                }
+            }
+        }
+        
+        int mul(int a, int b);
+        int div(int a, int b);
+        int add(int a, int b);
+        int sub(int a, int b);
+        int pow_gf(int a,int b); 
+
+        const vector<int>& get_alpha_to() const;
+        const vector<int>& get_index_of() const;
+        int get_size() const;
+        int get_m() const; 
+        int get_prim_poly() const;
+    };
 
 #endif
