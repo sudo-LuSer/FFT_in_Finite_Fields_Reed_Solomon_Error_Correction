@@ -7,9 +7,6 @@ RS_Encoder::RS_Encoder(int n, int k) : n(n), k(k) {
         throw invalid_argument("n must be greater than k");
     }
     t = (n - k) / 2; 
-    if (n > 255) {
-        throw invalid_argument("RS codes over GF(256) have max length 255");
-    }
     generator.clear();
 }
 
@@ -77,10 +74,6 @@ vector<int> RS_Encoder::poly_div(const vector<int>& dividend, const vector<int>&
 vector<int> RS_Encoder::encode(const vector<int>& message, GaloisField &gf) {
     if (message.size() != (size_t)k) {
         throw invalid_argument("Message length must be k = " + to_string(k));
-    }
-    
-    if (generator.empty()) {
-        build_generator(gf);
     }
     
     vector<int> mx_poly(n, 0);
