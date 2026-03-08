@@ -68,7 +68,7 @@ std::vector<int> RS_Decoder::berlekamp_massey(const std::vector<int>& syndromes)
 std::vector<int> RS_Decoder::chien_search(const std::vector<int>& lambda, std::vector<int>& error_positions){
     error_positions.clear();
     std::vector<int> X;
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; i++) {
         int x = gf.div(1, gf.get_alpha_to()[i]);
         if (poly_eval(lambda, x) == 0) {
             error_positions.push_back(i);
