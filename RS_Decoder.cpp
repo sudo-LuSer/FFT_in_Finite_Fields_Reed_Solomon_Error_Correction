@@ -65,28 +65,23 @@ std::vector<int> RS_Decoder::berlekamp_massey(const std::vector<int>& syndromes)
     return lambda;
 }
 
-// Recherche de Chien : trouve les positions d'erreur (inverses des racines)
-std::vector<int> RS_Decoder::chien_search(const std::vector<int>& lambda, std::vector<int>& error_positions) {
+std::vector<int> RS_Decoder::chien_search(const std::vector<int>& lambda, std::vector<int>& error_positions){
     error_positions.clear();
-    std::vector<int> X; // valeurs X_k = alpha^{pos}
+    std::vector<int> X;
     for (int i = 0; i < n; ++i) {
-        int x = gf.get_alpha_to()[i]; // alpha^i
-        int eval = poly_eval(lambda, x);
-        if (eval == 0) {
-            error_positions.push_back(i);          // position i (degré n-1-i si on utilise convention)
-            X.push_back(gf.div(1, x)); // X_k = alpha^{-i}
+        int x = gf.div(1, gf.get_alpha_to()[i]);
+        if (poly_eval(lambda, x) == 0) {
+            error_positions.push_back(i);
+            X.push_back(x);             
         }
     }
     return X;
 }
 
 std::vector<int> formal_derivative(const std::vector<int>& poly) {
-    std::vector<int> deriv;
-    for (size_t i = 1; i < poly.size(); i += 2) {
-        deriv.push_back(poly[i]); 
-        // en caractéristique 2, la dérivée de x^odd est x^{odd-1} avec même coeff
-        // Attention : en GF(2^m), la dérivée de x^even est 0. Donc on prend les coeff des degrés impairs.
-        // Mais ici on veut Λ'(x) = somme_{i impair} i * coeff_i * x^{i-1} avec i en GF? En fait en caractéristique 2, i est un entier, mais la multiplication par i est modulo 2, donc i impair donne 1, i pair donne 0. Donc Λ'(x) = somme des coeff des degrés impairs * x^{i-1}.
+    std::vector<int> deriv(poly.size() - 1, 0);
+    for (size_t i = 1; i < poly.size(); i+=2) {
+        deriv[i-1] = poly[i]; 
     }
     return deriv;
 }
@@ -108,7 +103,8 @@ std::vector<int> RS_Decoder::forney(const std::vector<int>& lambda, const std::v
         if (denom == 0) {
             // erreur, mais normalement ne devrait pas arriver
             error_values[idx] = 0;
-        } else {
+        } 
+        else {
             error_values[idx] = gf.div(numer, denom);
             // Note : en GF(2^m), la soustraction est identique à l'addition, donc le signe moins est ignoré
         }
