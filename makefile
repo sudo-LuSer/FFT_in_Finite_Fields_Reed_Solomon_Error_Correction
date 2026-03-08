@@ -1,24 +1,36 @@
-objects = main.o RS_tools.o RS_Encoder.o RS_Decoder.o
+CXX       = g++
+CXXFLAGS  = -std=c++17 -Wall -Wextra -O2 -Iinclude
+LDFLAGS   =
 
-program : $(objects)
-	g++ -Wall -o programme $(objects)
-	./programme
+TARGET    = RS_RUN
 
-main.o : main.cpp
-	g++ -Wall -c main.cpp
+SRCDIR    = src
+INCDIR    = include
+OBJDIR    = obj
 
-RS_tools.o : RS_tools.cpp
-	g++ -Wall -c RS_tools.cpp
+SRCS      = $(wildcard $(SRCDIR)/*.cpp)
+OBJS      = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SRCS))
 
-RS_Encoder.o : RS_Encoder.cpp 
-	g++ -Wall -c RS_Encoder.cpp
+all: $(TARGET)
 
-RS_Decoder.o : RS_Decoder.cpp 
-	g++ -Wall -c RS_Decoder.cpp
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-valgrind : $(programme)
-	g++ -Wall -o programme $(objects)
-	valgrind ./programme
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	-mkdir $(OBJDIR)    
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+DEPS = $(OBJS:.o=.d)
+-include $(DEPS)
+
+$(OBJDIR)/%.d: $(SRCDIR)/%.cpp
+	-mkdir $(OBJDIR)      # <- idem ici
+	$(CXX) $(CXXFLAGS) -MM -MT $(@:.d=.o) $< > $@
 
 clean:
-	rm -f $(objects) programme
+	rm -rf $(OBJDIR) $(TARGET)
+
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: all clean run
