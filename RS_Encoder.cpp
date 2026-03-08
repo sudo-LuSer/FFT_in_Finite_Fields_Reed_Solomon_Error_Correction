@@ -1,10 +1,9 @@
 #include "RS_Encoder.hpp"
 #include "RS_tools.hpp"
-#include <string>
 
 RS_Encoder::RS_Encoder(int n, int k) : n(n), k(k) {
     if (n <= k) {
-        throw invalid_argument("n must be greater than k");
+        throw std :: invalid_argument("n must be greater than k");
     }
     t = (n - k) / 2; 
     generator.clear();
@@ -19,9 +18,9 @@ void RS_Encoder::build_generator(GaloisField &gf) {
     }
 }
 
-vector<int> RS_Encoder::poly_mult_by_binomial(const vector<int>& poly, int a, GaloisField &gf) {
+std :: vector<int> RS_Encoder::poly_mult_by_binomial(const std :: vector<int>& poly, int a, GaloisField &gf) {
     size_t degree = poly.size();
-    vector<int> result(degree + 1, 0);
+    std :: vector<int> result(degree + 1, 0);
     
     for (size_t j = 0; j < degree; j++) {
         result[j + 1] = poly[j];
@@ -35,12 +34,12 @@ vector<int> RS_Encoder::poly_mult_by_binomial(const vector<int>& poly, int a, Ga
     return result;
 }
 
-vector<int> RS_Encoder::poly_div(const vector<int>& dividend, const vector<int>& divisor, GaloisField &gf) {
-    vector<int> remainder = dividend;
+std :: vector<int> RS_Encoder::poly_div(const std :: vector<int>& dividend, const std :: vector<int>& divisor, GaloisField &gf) {
+    std :: vector<int> remainder = dividend;
     int deg_d = (int)divisor.size() - 1;
     
     if (divisor.empty() || divisor[deg_d] == 0) {
-        throw invalid_argument("Divisor polynomial is zero or invalid");
+        throw std :: invalid_argument("Divisor polynomial is zero or invalid");
     }
     
     while(remainder.size() >= divisor.size() && !remainder.empty()) {
@@ -48,7 +47,7 @@ vector<int> RS_Encoder::poly_div(const vector<int>& dividend, const vector<int>&
         int shift = deg_r - deg_d;
         
         if (divisor[deg_d] == 0) {
-            throw runtime_error("Leading coefficient of divisor is zero");
+            throw std :: runtime_error("Leading coefficient of divisor is zero");
         }
         
         int coef = gf.div(remainder[deg_r], divisor[deg_d]);
@@ -71,25 +70,25 @@ vector<int> RS_Encoder::poly_div(const vector<int>& dividend, const vector<int>&
     return remainder;
 }
 
-vector<int> RS_Encoder::encode(const vector<int>& message, GaloisField &gf) {
+std :: vector<int> RS_Encoder::encode(const std :: vector<int>& message, GaloisField &gf) {
     if (message.size() != (size_t)k) {
-        throw invalid_argument("Message length must be k = " + to_string(k));
+        throw std :: invalid_argument("Message length must be k = " + std :: to_string(k));
     }
     
-    vector<int> mx_poly(n, 0);
+    std :: vector<int> mx_poly(n, 0);
     for (int i = 0; i < k; i++) {
         mx_poly[n - k + i] = message[i];
     }
     
-    vector<int> remainder = poly_div(mx_poly, generator, gf);
+    std :: vector<int> remainder = poly_div(mx_poly, generator, gf);
     
     remainder.resize(n - k, 0);
     
-    vector<int> codeword = remainder;
+    std :: vector<int> codeword = remainder;
     codeword.insert(codeword.end(), message.begin(), message.end());
     
     if (codeword.size() != (size_t)n) {
-        throw runtime_error("Codeword length incorrect");
+        throw std :: runtime_error("Codeword length incorrect");
     }
     
     return codeword;

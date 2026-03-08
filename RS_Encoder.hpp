@@ -2,9 +2,6 @@
 #define RS_ENCODER_HPP
 
 #include <vector>
-#include <stdexcept>
-#include <string>
-using namespace std;
 
 class GaloisField;
 
@@ -13,18 +10,18 @@ private:
     int n;              
     int k;          
     int t;             
-    vector<int> generator; 
+    std :: vector<int> generator; 
     
 public: 
     RS_Encoder(int n, int k);
     
-    const vector<int>& get_generator() const { return generator; }
+    const std :: vector<int>& get_generator() const { return generator; }
     int get_degree() const { return generator.empty() ? 0 : (int)generator.size() - 1; }
     
     void build_generator(GaloisField &gf);
-    vector<int> encode(const vector<int>& message, GaloisField &gf);
-    vector<int> poly_div(const vector<int>& dividend, const vector<int>& divisor, GaloisField &gf);
-    vector<int> poly_mult_by_binomial(const vector<int>& poly, int a, GaloisField &gf);
+    std :: vector<int> encode(const std :: vector<int>& message, GaloisField &gf);
+    std :: vector<int> poly_div(const std :: vector<int>& dividend, const std :: vector<int>& divisor, GaloisField &gf);
+    std :: vector<int> poly_mult_by_binomial(const std :: vector<int>& poly, int a, GaloisField &gf);
 };
 
 #endif

@@ -1,9 +1,8 @@
 #include "RS_tools.hpp"
-#include <stdexcept>
 
 GaloisField::GaloisField(int m) : m(m), prim_poly(poly_masks[m]) {
     if (m < 2 || m > 20) {
-        throw invalid_argument("m must be between 2 and 20");
+        throw std :: invalid_argument("m must be between 2 and 20");
     }
     
     size = 1 << m;
@@ -36,7 +35,7 @@ int GaloisField::mul(int a, int b) {
 }
 
 int GaloisField::div(int a, int b) {
-    if (b == 0) throw invalid_argument("Division by zero");
+    if (b == 0) throw std :: invalid_argument("Division by zero");
     if (a == 0) return 0;
     int log_a = index_of[a];
     int log_b = index_of[b];
@@ -58,5 +57,5 @@ int GaloisField::get_size() const { return size; }
 int GaloisField::get_m() const { return m; }
 int GaloisField::get_prim_poly() const { return prim_poly; }
 
-const vector<int>& GaloisField::get_alpha_to() const { return alpha_to; }
-const vector<int>& GaloisField::get_index_of() const { return index_of; }
+const std :: vector<int>& GaloisField::get_alpha_to() const { return alpha_to; }
+const std :: vector<int>& GaloisField::get_index_of() const { return index_of; }

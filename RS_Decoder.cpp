@@ -1,0 +1,171 @@
+#include "RS_Decoder.hpp"
+#include <algorithm>
+#include <complex>
+#include <cmath>
+
+using cd = std::complex<double>;
+const double PI = acos(-1);
+
+RS_Decoder::RS_Decoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(gf) {
+    t = (n - k) / 2;
+}
+
+int RS_Decoder::poly_eval(const std::vector<int>& poly, int x) {
+    int result = 0;
+    for (int i = (int)poly.size() - 1; i >= 0; --i) {
+        result = gf.add(gf.mul(result, x), poly[i]); // LFSR
+    }
+    return result;
+}
+
+std::vector<int> RS_Decoder::compute_syndromes(const std::vector<int>& received) {
+    std::vector<int> syndromes(2*t, 0);
+    for (int i = 0; i < 2*t; i++) {
+        int alpha_i = gf.get_alpha_to()[(i+1) % (gf.get_size() - 1)]; 
+        syndromes[i] = poly_eval(received, alpha_i);
+    }
+    return syndromes;
+}
+
+std::vector<int> RS_Decoder::berlekamp_massey(const std::vector<int>& syndromes) {
+    int L = 0; 
+    std::vector<int> lambda(2*t + 1, 0);
+    lambda[0] = 1;
+    std::vector<int> b(2*t + 1, 0);
+    b[0] = 1;
+    int m = 1;
+    for (int r = 0; r < 2*t; r++) { // Voir algo dans le doc
+        int d = syndromes[r];
+        for (int i = 1; i <= L; i++) {
+            d = gf.add(d, gf.mul(lambda[i], syndromes[r - i]));
+        }
+        if(d==0){
+            m++;
+        }
+        else if(2*L <= r){
+            std::vector<int> T = lambda;
+            for (int i = 0; (i<b.size()) && ((i + m) < lambda.size()); i++){
+                lambda[i + m] = gf.sub(lambda[i + m], gf.mul(d, b[i]));
+            }
+            L = r + 1 - L; b = T; m = 1; 
+
+            int inv_d = gf.div(1, d);
+            for (int &val : b)
+                val = gf.mul(val, inv_d);
+        } 
+        else{
+            for (int i = 0; (i<b.size()) && ((i + m) < lambda.size()); i++){
+                lambda[i + m] = gf.sub(lambda[i + m], gf.mul(d, b[i]));
+            }
+            m++;
+        }
+    }
+    while (!lambda.empty() && lambda.back() == 0) 
+        lambda.pop_back();
+    return lambda;
+}
+
+// Recherche de Chien : trouve les positions d'erreur (inverses des racines)
+std::vector<int> RS_Decoder::chien_search(const std::vector<int>& lambda, std::vector<int>& error_positions) {
+    error_positions.clear();
+    std::vector<int> X; // valeurs X_k = alpha^{pos}
+    for (int i = 0; i < n; ++i) {
+        int x = gf.get_alpha_to()[i]; // alpha^i
+        int eval = poly_eval(lambda, x);
+        if (eval == 0) {
+            error_positions.push_back(i);          // position i (degré n-1-i si on utilise convention)
+            X.push_back(gf.div(1, x)); // X_k = alpha^{-i}
+        }
+    }
+    return X;
+}
+
+std::vector<int> formal_derivative(const std::vector<int>& poly) {
+    std::vector<int> deriv;
+    for (size_t i = 1; i < poly.size(); i += 2) {
+        deriv.push_back(poly[i]); 
+        // en caractéristique 2, la dérivée de x^odd est x^{odd-1} avec même coeff
+        // Attention : en GF(2^m), la dérivée de x^even est 0. Donc on prend les coeff des degrés impairs.
+        // Mais ici on veut Λ'(x) = somme_{i impair} i * coeff_i * x^{i-1} avec i en GF? En fait en caractéristique 2, i est un entier, mais la multiplication par i est modulo 2, donc i impair donne 1, i pair donne 0. Donc Λ'(x) = somme des coeff des degrés impairs * x^{i-1}.
+    }
+    return deriv;
+}
+
+// Algorithme de Forney
+std::vector<int> RS_Decoder::forney(const std::vector<int>& lambda, const std::vector<int>& omega, const std::vector<int>& error_positions, const std::vector<int>& X) {
+    std::vector<int> error_values(error_positions.size());
+    std::vector<int> lambda_prime = formal_derivative(lambda);
+    for (size_t idx = 0; idx < X.size(); ++idx) {
+        int Xi = X[idx]; // X_k = alpha^{-i}
+        int Xi_inv = gf.div(1, Xi); // alpha^i
+        // Évaluer Ω en Xi^{-1}
+        int omega_eval = poly_eval(omega, Xi_inv);
+        // Évaluer Λ' en Xi^{-1}
+        int lambda_prime_eval = poly_eval(lambda_prime, Xi_inv);
+        // Valeur d'erreur = - Xi * Ω(Xi^{-1}) / Λ'(Xi^{-1})
+        int numer = gf.mul(Xi, omega_eval);
+        int denom = lambda_prime_eval;
+        if (denom == 0) {
+            // erreur, mais normalement ne devrait pas arriver
+            error_values[idx] = 0;
+        } else {
+            error_values[idx] = gf.div(numer, denom);
+            // Note : en GF(2^m), la soustraction est identique à l'addition, donc le signe moins est ignoré
+        }
+    }
+    return error_values;
+}
+
+// Décodage complet
+std::vector<int> RS_Decoder::decode(const std::vector<int>& received) {
+    // 1. Syndromes
+    std::vector<int> syndromes = compute_syndromes(received);
+    bool all_zero = true;
+    for (int s : syndromes) if (s != 0) { all_zero = false; break; }
+    if (all_zero) return received; // pas d'erreur
+
+    // 2. Berlekamp-Massey
+    std::vector<int> lambda = berlekamp_massey(syndromes);
+
+    // 3. Calcul de Ω(x) = S(x) * Λ(x) mod x^{2t}
+    // Il faut d'abord construire le polynôme syndrome S(x) = S1 + S2 x + ... + S_{2t} x^{2t-1}
+    std::vector<int> S_poly(syndromes.size());
+    for (size_t i = 0; i < syndromes.size(); ++i) S_poly[i] = syndromes[i];
+    std::vector<int> omega = poly_mult(S_poly, lambda);
+    omega.resize(2*t); // on garde les degrés < 2t
+
+    // 4. Recherche des positions d'erreur
+    std::vector<int> error_positions;
+    std::vector<int> X = chien_search(lambda, error_positions);
+
+    if (error_positions.size() != lambda.size() - 1) {
+        // Nombre d'erreurs incohérent -> échec
+        throw std::runtime_error("Decoding failure: number of errors mismatch");
+    }
+
+    // 5. Calcul des valeurs d'erreur
+    std::vector<int> error_values = forney(lambda, omega, error_positions, X);
+
+    // 6. Correction
+    std::vector<int> corrected = received;
+    for (size_t idx = 0; idx < error_positions.size(); ++idx) {
+        int pos = error_positions[idx];
+        // Attention : selon la convention d'indexation des symboles (poids fort ou faible),
+        // la position peut correspondre à l'ordre des coefficients. Ici on suppose que received[0] est le coefficient de x^0.
+        corrected[pos] = gf.sub(corrected[pos], error_values[idx]); // car erreur = valeur - correct, donc correct = valeur - erreur
+    }
+
+    return corrected;
+}
+
+std::vector<int> RS_Decoder::poly_mult(const std::vector<int>& a, const std::vector<int>& b) {
+    std::vector<int> res(a.size() + b.size() - 1, 0);
+    for (size_t i = 0; i < a.size(); ++i) {
+        if (a[i] == 0) continue;
+        for (size_t j = 0; j < b.size(); ++j) {
+            if (b[j] == 0) continue;
+            res[i+j] = gf.add(res[i+j], gf.mul(a[i], b[j]));
+        }
+    }
+    return res;
+} // peut etre à améliorer avec un FFT 

@@ -5,8 +5,6 @@
 #include <cstdint>
 #include <stdexcept>
 
-using namespace std;
-
 const uint32_t poly_masks[21] = {
     0,          // m=0 (non utilisé)
     0,          // m=1 (non utilisé)
@@ -36,8 +34,8 @@ private:
     int m;              // Degree of the field 
     int size;           // ordre des éléments : 2^m
     int prim_poly;      // Polynôme primitif P(X)
-    vector<int> alpha_to; // hash_map: alpha^i -> polynomial form
-    vector<int> index_of; // hash_map : logarithme discret polynomial form -> exponent i
+    std :: vector<int> alpha_to; // hash_map: alpha^i -> polynomial form
+    std :: vector<int> index_of; // hash_map : logarithme discret polynomial form -> exponent i
     
 public:
     GaloisField(int m);
@@ -48,8 +46,8 @@ public:
     int sub(int a, int b);
     int pow_gf(int a, int n);
 
-    const vector<int>& get_alpha_to() const;
-    const vector<int>& get_index_of() const;
+    const std :: vector<int>& get_alpha_to() const;
+    const std :: vector<int>& get_index_of() const;
     int get_size() const;
     int get_m() const;
     int get_prim_poly() const;
