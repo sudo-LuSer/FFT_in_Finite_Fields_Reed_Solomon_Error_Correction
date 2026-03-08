@@ -86,69 +86,51 @@ std::vector<int> formal_derivative(const std::vector<int>& poly) {
     return deriv;
 }
 
-// Algorithme de Forney
 std::vector<int> RS_Decoder::forney(const std::vector<int>& lambda, const std::vector<int>& omega, const std::vector<int>& error_positions, const std::vector<int>& X) {
     std::vector<int> error_values(error_positions.size());
     std::vector<int> lambda_prime = formal_derivative(lambda);
-    for (size_t idx = 0; idx < X.size(); ++idx) {
-        int Xi = X[idx]; // X_k = alpha^{-i}
-        int Xi_inv = gf.div(1, Xi); // alpha^i
-        // Évaluer Ω en Xi^{-1}
+    int idx = 0 ;
+    for (auto Xi : X) {
+        int Xi_inv = gf.div(1, Xi);
         int omega_eval = poly_eval(omega, Xi_inv);
-        // Évaluer Λ' en Xi^{-1}
-        int lambda_prime_eval = poly_eval(lambda_prime, Xi_inv);
-        // Valeur d'erreur = - Xi * Ω(Xi^{-1}) / Λ'(Xi^{-1})
+        int df_lambda_eval = poly_eval(lambda_prime, Xi_inv);
         int numer = gf.mul(Xi, omega_eval);
-        int denom = lambda_prime_eval;
-        if (denom == 0) {
-            // erreur, mais normalement ne devrait pas arriver
-            error_values[idx] = 0;
-        } 
-        else {
-            error_values[idx] = gf.div(numer, denom);
-            // Note : en GF(2^m), la soustraction est identique à l'addition, donc le signe moins est ignoré
-        }
+        int denom = df_lambda_eval;
+        error_values[idx] = denom == 0 ? 0 : gf.div(numer, denom);
+        idx++;
     }
     return error_values;
 }
 
-// Décodage complet
 std::vector<int> RS_Decoder::decode(const std::vector<int>& received) {
-    // 1. Syndromes
     std::vector<int> syndromes = compute_syndromes(received);
     bool all_zero = true;
-    for (int s : syndromes) if (s != 0) { all_zero = false; break; }
-    if (all_zero) return received; // pas d'erreur
-
-    // 2. Berlekamp-Massey
+    for (int s : syndromes){
+        if (s != 0){
+            all_zero = false; 
+            break;
+        }
+    }
+    if (all_zero) 
+        return received;
     std::vector<int> lambda = berlekamp_massey(syndromes);
 
-    // 3. Calcul de Ω(x) = S(x) * Λ(x) mod x^{2t}
-    // Il faut d'abord construire le polynôme syndrome S(x) = S1 + S2 x + ... + S_{2t} x^{2t-1}
-    std::vector<int> S_poly(syndromes.size());
-    for (size_t i = 0; i < syndromes.size(); ++i) S_poly[i] = syndromes[i];
-    std::vector<int> omega = poly_mult(S_poly, lambda);
-    omega.resize(2*t); // on garde les degrés < 2t
+    std::vector<int> omega = poly_mult(syndromes, lambda);
+    omega.resize(2*t); // mod x^{2t}
 
-    // 4. Recherche des positions d'erreur
     std::vector<int> error_positions;
     std::vector<int> X = chien_search(lambda, error_positions);
 
     if (error_positions.size() != lambda.size() - 1) {
-        // Nombre d'erreurs incohérent -> échec
         throw std::runtime_error("Decoding failure: number of errors mismatch");
     }
 
-    // 5. Calcul des valeurs d'erreur
     std::vector<int> error_values = forney(lambda, omega, error_positions, X);
 
-    // 6. Correction
     std::vector<int> corrected = received;
     for (size_t idx = 0; idx < error_positions.size(); ++idx) {
         int pos = error_positions[idx];
-        // Attention : selon la convention d'indexation des symboles (poids fort ou faible),
-        // la position peut correspondre à l'ordre des coefficients. Ici on suppose que received[0] est le coefficient de x^0.
-        corrected[pos] = gf.sub(corrected[pos], error_values[idx]); // car erreur = valeur - correct, donc correct = valeur - erreur
+        corrected[pos] = gf.sub(corrected[pos], error_values[idx]);
     }
 
     return corrected;

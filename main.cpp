@@ -39,10 +39,15 @@ int main(){
     for(auto x : CodeWord)
         std :: cout << x << " ";
     std :: cout << std :: endl;
+    std :: cout << std :: endl; 
 
     /// injection d'erreur 
 
     CodeWord[0] = gf.add(CodeWord[0], 1); 
+
+    // Decodage
+
+    std :: cout << "Sortie du décodeur :"; 
 
     RS_Decoder RS_Dec(n, k, gf); 
     auto start_decode = std::chrono::high_resolution_clock::now();
@@ -53,7 +58,8 @@ int main(){
     
     for(auto x : ERR_Correc)
         std :: cout << x << " "; 
-    return 0;
+    
+    std :: cout << std :: endl; 
 
     auto duration_div = std::chrono::duration_cast<std::chrono::microseconds>(end_div - start_div);
     auto duration_encode = std::chrono::duration_cast<std::chrono::microseconds>(end_encode - start_encode);
@@ -61,8 +67,8 @@ int main(){
     auto duration_total = std::chrono::duration_cast<std::chrono::microseconds>(end_total - start_total);
     
     std::cout << "\n--- Temps de calcul ---" << std::endl;
-    std::cout << "Division polynomiale (reste) : " << duration_div.count() << " µs" << std::endl;
-    std::cout << "Encodage complet : " << duration_encode.count() << " µs" << std::endl;
-    std::cout << "Décodage : " << duration_decode.count() << " µs" << std::endl;
-    std::cout << "Temps total : " << duration_total.count() << " µs" << std::endl;
+    std::cout << "Division polynomiale (reste) : " << duration_div.count() << " micros" << std::endl;
+    std::cout << "Encodage complet : " << duration_encode.count() << " micros" << std::endl;
+    std::cout << "Décodage : " << duration_decode.count() << " micros" << std::endl;
+    std::cout << "Temps total : " << duration_total.count() << " micros" << std::endl;
 }
