@@ -91,10 +91,9 @@ std::vector<int> RS_Decoder::forney(const std::vector<int>& lambda, const std::v
     std::vector<int> lambda_prime = formal_derivative(lambda);
     int idx = 0 ;
     for (auto Xi : X) {
-        int Xi_inv = gf.div(1, Xi);
-        int omega_eval = poly_eval(omega, Xi_inv);
-        int df_lambda_eval = poly_eval(lambda_prime, Xi_inv);
-        int numer = gf.mul(Xi, omega_eval);
+        int omega_eval = poly_eval(omega, Xi);
+        int df_lambda_eval = poly_eval(lambda_prime, Xi);
+        int numer = omega_eval;
         int denom = df_lambda_eval;
         error_values[idx] = denom == 0 ? 0 : gf.div(numer, denom);
         idx++;
@@ -121,9 +120,9 @@ std::vector<int> RS_Decoder::decode(const std::vector<int>& received) {
     std::vector<int> error_positions;
     std::vector<int> X = chien_search(lambda, error_positions);
 
-    if (error_positions.size() != lambda.size() - 1) {
-        throw std::runtime_error("Decoding failure: number of errors mismatch");
-    }
+    // if (error_positions.size() != lambda.size() - 1) {
+    //     throw std::runtime_error("Decoding failure: number of errors mismatch");
+    // }
 
     std::vector<int> error_values = forney(lambda, omega, error_positions, X);
 

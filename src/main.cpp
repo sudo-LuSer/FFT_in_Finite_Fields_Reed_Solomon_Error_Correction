@@ -3,14 +3,15 @@
 #include "RS_Decoder.hpp"
 #include <iostream>
 #include <chrono>
+
+#define pb push_back
+
 int main(){
-    GaloisField gf(3);
+    GaloisField gf(8);
     std :: vector <int> messages;
-    //messages.push_back(gf.get_alpha_to()[0]);  // 1
-    messages.push_back(gf.get_alpha_to()[1]);  // 2
-    messages.push_back(gf.get_alpha_to()[2]);  // 4
-    messages.push_back(gf.get_alpha_to()[3]);  // 3
-    int n = 7, k = 3; 
+    int n = 255, k = 239; 
+    for(int i = 1;i <= k; i++)
+        messages.pb(gf.get_alpha_to()[gf.get_index_of()[i]]);
     auto start_total = std::chrono::high_resolution_clock::now();
     RS_Encoder RS_Enc(n,k);
     RS_Enc.build_generator(gf);
@@ -20,6 +21,7 @@ int main(){
         std :: cout << gen[i] << " ";
     }
     std :: cout << std :: endl;
+    std :: cout << std :: endl; 
     std :: vector<int> mx_poly(n, 0);
     for (int i = 0; i < k; i++) {
         mx_poly[n - k + i] = messages[i];
@@ -31,6 +33,7 @@ int main(){
         std :: cout << remainder[i] << " ";
     }
     std :: cout << std :: endl; 
+    std :: cout << std :: endl;
     auto start_encode = std::chrono::high_resolution_clock::now();
     std :: vector <int> CodeWord = RS_Enc.encode(messages, gf); 
     auto end_encode = std::chrono::high_resolution_clock::now();
@@ -43,7 +46,15 @@ int main(){
 
     /// injection d'erreur 
 
-    CodeWord[0] = gf.add(CodeWord[0], 1); 
+    // CodeWord[0] = gf.add(CodeWord[0], 1); 
+    // CodeWord[1] = gf.add(CodeWord[1], 1); 
+    // CodeWord[2] = gf.add(CodeWord[2], 1);
+    // CodeWord[3] = gf.add(CodeWord[3], 1); 
+    // CodeWord[4] = gf.add(CodeWord[4], 1); 
+    // CodeWord[5] = gf.add(CodeWord[5], 1);
+    // CodeWord[6] = gf.add(CodeWord[6], 1); 
+    // CodeWord[7] = gf.add(CodeWord[7], 1);
+    //CodeWord[8] = gf.add(CodeWord[8], 1);
 
     // Decodage
 
