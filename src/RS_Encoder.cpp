@@ -12,8 +12,9 @@ RS_Encoder::RS_Encoder(int n, int k) : n(n), k(k) {
 void RS_Encoder::build_generator(GaloisField &gf) {
     generator.clear();
     generator.push_back(1);
+    const std :: vector <int> alpha_to_reg = gf.get_alpha_to();
     for (int i = 1; i <= n-k; i++) {
-        int alpha_i = gf.get_alpha_to()[i % (gf.get_size() - 1)];
+        int alpha_i = alpha_to_reg[i];
         generator = poly_mult_by_binomial(generator, alpha_i, gf);
     }
 }
@@ -27,9 +28,7 @@ std :: vector<int> RS_Encoder::poly_mult_by_binomial(const std :: vector<int>& p
     }
 
     for (size_t j = 0; j < degree; j++) {
-        if (poly[j] != 0) {
-            result[j] = gf.add(result[j], gf.mul(poly[j], a));
-        }
+        result[j] = poly[j] != 0 ? gf.add(result[j], gf.mul(poly[j], a)) : result[j];
     }
     return result;
 }
@@ -45,10 +44,6 @@ std :: vector<int> RS_Encoder::poly_div(const std :: vector<int>& dividend, cons
     while(remainder.size() >= divisor.size() && !remainder.empty()) {
         int deg_r = (int)remainder.size() - 1;
         int shift = deg_r - deg_d;
-        
-        if (divisor[deg_d] == 0) {
-            throw std :: runtime_error("Leading coefficient of divisor is zero");
-        }
         
         int coef = gf.div(remainder[deg_r], divisor[deg_d]);
         
@@ -75,11 +70,8 @@ std :: vector<int> RS_Encoder::encode(const std :: vector<int>& message, GaloisF
         throw std :: invalid_argument("Message length must be k = " + std :: to_string(k));
     }
     
-    std :: vector<int> mx_poly(n, 0);
-    for (int i = 0; i < k; i++) {
-        mx_poly[n - k + i] = message[i];
-    }
-    
+    std :: vector<int> mx_poly(message.begin(), message.end());
+    mx_poly.insert(mx_poly.begin(), n-k, 0);
     std :: vector<int> remainder = poly_div(mx_poly, generator, gf);
     
     remainder.resize(n - k, 0);

@@ -9,7 +9,7 @@
 int main(){
     GaloisField gf(8);
     std :: vector <int> messages;
-    int n = 255, k = 239; 
+    int n = 255, k = 3; 
     for(int i = 1;i <= k; i++)
         messages.pb(gf.get_alpha_to()[gf.get_index_of()[i]]);
     auto start_total = std::chrono::high_resolution_clock::now();
@@ -29,14 +29,14 @@ int main(){
 
     /// injection d'erreur 
 
-    CodeWord[0] = gf.add(CodeWord[0], 1); 
-    CodeWord[1] = gf.add(CodeWord[1], 1); 
-    CodeWord[2] = gf.add(CodeWord[2], 1);
-    CodeWord[3] = gf.add(CodeWord[3], 1); 
-    CodeWord[4] = gf.add(CodeWord[4], 1); 
-    CodeWord[5] = gf.add(CodeWord[5], 1);
-    CodeWord[6] = gf.add(CodeWord[6], 1); 
-    CodeWord[7] = gf.add(CodeWord[7], 1);
+    // CodeWord[0] = gf.add(CodeWord[0], 1); 
+    // CodeWord[1] = gf.add(CodeWord[1], 1); 
+    // CodeWord[2] = gf.add(CodeWord[2], 1);
+    // CodeWord[3] = gf.add(CodeWord[3], 1); 
+    // CodeWord[4] = gf.add(CodeWord[4], 1); 
+    // CodeWord[5] = gf.add(CodeWord[5], 1);
+    // CodeWord[6] = gf.add(CodeWord[6], 1); 
+    // CodeWord[7] = gf.add(CodeWord[7], 1);
     //CodeWord[8] = gf.add(CodeWord[8], 1);
 
     // Decodage
