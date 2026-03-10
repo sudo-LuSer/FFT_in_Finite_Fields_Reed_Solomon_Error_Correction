@@ -1,87 +1,88 @@
 #include "RS_Encoder.hpp"
-#include "RS_tools.hpp"
+#include <stdexcept>
+#include <algorithm>
 
-RS_Encoder::RS_Encoder(int n, int k) : n(n), k(k) {
-    if (n <= k) {
-        throw std :: invalid_argument("n must be greater than k");
-    }
-    t = (n - k) / 2; 
-    generator.clear();
+// ─────────────────────────────────────────────
+//  Constructor — same signature as before
+// ─────────────────────────────────────────────
+RS_Encoder::RS_Encoder(int n, int k)
+    : n(n), k(k), n_rdncy(n - k), field_order(0)
+{
+    if (n <= k)
+        throw std::invalid_argument("n must be greater than k");
 }
 
-void RS_Encoder::build_generator(GaloisField &gf) {
-    generator.clear();
-    generator.push_back(1);
-    const std :: vector <int> alpha_to_reg = gf.get_alpha_to();
-    for (int i = 1; i <= n-k; i++) {
-        int alpha_i = alpha_to_reg[i];
-        generator = poly_mult_by_binomial(generator, alpha_i, gf);
+// ─────────────────────────────────────────────
+//  build_generator — same signature as before
+//  Internally: in-place multiply + g_log precompute
+//  + parity buffer pre-allocation
+// ─────────────────────────────────────────────
+void RS_Encoder::build_generator(GaloisField& gf) {
+    field_order = gf.get_size() - 1;
+    const int* alpha_to = gf.get_alpha_to().data();
+    const int* index_of = gf.get_index_of().data();
+
+    generator.assign(n_rdncy + 1, 0);
+    generator[0] = 1;
+
+    // In-place multiply by (X + alpha^i), high to low to avoid overwrite
+    for (int i = 1; i <= n_rdncy; i++) {
+        int alpha_i = alpha_to[i % field_order];
+        for (int j = i; j > 0; j--) {
+            if (generator[j - 1] != 0)
+                generator[j] ^= gf.mul(generator[j - 1], alpha_i);
+        }
+        generator[0] = gf.mul(generator[0], alpha_i);
     }
+
+    // Pre-compute log form — -1 sentinel for zero coefficients
+    g_log.resize(n_rdncy + 1);
+    for (int i = 0; i <= n_rdncy; i++)
+        g_log[i] = (generator[i] != 0) ? index_of[generator[i]] : -1;
+
+    // Pre-allocate parity buffer once here, reused in every encode() call
+    parity.assign(n_rdncy, 0);
 }
 
-std :: vector<int> RS_Encoder::poly_mult_by_binomial(const std :: vector<int>& poly, int a, GaloisField &gf) {
-    size_t degree = poly.size();
-    std :: vector<int> result(degree + 1, 0);
-    
-    for (size_t j = 0; j < degree; j++) {
-        result[j + 1] = poly[j];
-    }
+// ─────────────────────────────────────────────
+//  encode — same signature as before
+//  Internally: LFSR instead of poly_div,
+//  raw pointer access, no per-call allocation
+// ─────────────────────────────────────────────
+std::vector<int> RS_Encoder::encode(const std::vector<int>& message, GaloisField& gf) {
+    if ((int)message.size() != k)
+        throw std::invalid_argument("Message length must be k = " + std::to_string(k));
 
-    for (size_t j = 0; j < degree; j++) {
-        result[j] = poly[j] != 0 ? gf.add(result[j], gf.mul(poly[j], a)) : result[j];
-    }
-    return result;
-}
+    const int* alpha_to = gf.get_alpha_to().data();
+    const int* index_of = gf.get_index_of().data();
 
-std :: vector<int> RS_Encoder::poly_div(const std :: vector<int>& dividend, const std :: vector<int>& divisor, GaloisField &gf) {
-    std :: vector<int> remainder = dividend;
-    int deg_d = (int)divisor.size() - 1;
-    
-    if (divisor.empty() || divisor[deg_d] == 0) {
-        throw std :: invalid_argument("Divisor polynomial is zero or invalid");
-    }
-    
-    while(remainder.size() >= divisor.size() && !remainder.empty()) {
-        int deg_r = (int)remainder.size() - 1;
-        int shift = deg_r - deg_d;
-        
-        int coef = gf.div(remainder[deg_r], divisor[deg_d]);
-        
-        for(int i = 0; i <= deg_d; i++) {
-            if (i + shift < (int)remainder.size()) {
-                remainder[i + shift] = gf.sub(remainder[i + shift], gf.mul(coef, divisor[i]));
+    // Reset parity buffer — no heap allocation
+    std::fill(parity.begin(), parity.end(), 0);
+
+    // LFSR: process message symbols high→low
+    for (int i = k - 1; i >= 0; i--) {
+        const int feedback_sym = message[i] ^ parity[n_rdncy - 1];
+        const int log_fb = (feedback_sym != 0) ? index_of[feedback_sym] : -1;
+
+        if (log_fb != -1) {
+            for (int j = n_rdncy - 1; j > 0; j--) {
+                parity[j] = parity[j - 1];
+                if (g_log[j] != -1)
+                    parity[j] ^= alpha_to[(g_log[j] + log_fb) % field_order];
             }
-        }
-        
-        while(!remainder.empty() && remainder.back() == 0) {
-            remainder.pop_back();
+            parity[0] = (g_log[0] != -1) ? alpha_to[(g_log[0] + log_fb) % field_order] : 0;
+        } else {
+            for (int j = n_rdncy - 1; j > 0; j--)
+                parity[j] = parity[j - 1];
+            parity[0] = 0;
         }
     }
-    
-    if (remainder.empty()) {
-        return {0};
-    }
-    
-    return remainder;
-}
 
-std :: vector<int> RS_Encoder::encode(const std :: vector<int>& message, GaloisField &gf) {
-    if (message.size() != (size_t)k) {
-        throw std :: invalid_argument("Message length must be k = " + std :: to_string(k));
-    }
-    
-    std :: vector<int> mx_poly(message.begin(), message.end());
-    mx_poly.insert(mx_poly.begin(), n-k, 0);
-    std :: vector<int> remainder = poly_div(mx_poly, generator, gf);
-    
-    remainder.resize(n - k, 0);
-    
-    std :: vector<int> codeword = remainder;
+    // Build codeword: [parity | message] — one reserve, two inserts, no copies
+    std::vector<int> codeword;
+    codeword.reserve(n);
+    codeword.insert(codeword.end(), parity.begin(), parity.end());
     codeword.insert(codeword.end(), message.begin(), message.end());
-    
-    if (codeword.size() != (size_t)n) {
-        throw std :: runtime_error("Codeword length incorrect");
-    }
-    
+
     return codeword;
 }
