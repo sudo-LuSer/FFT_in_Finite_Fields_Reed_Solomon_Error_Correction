@@ -1,4 +1,0 @@
-/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/rs/build/CMakeFiles/edit_cache.dir
-/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/rs/build/CMakeFiles/rebuild_cache.dir
-/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/rs/build/CMakeFiles/rs.dir
-/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/rs/build/CMakeFiles/rs_custom.dir
