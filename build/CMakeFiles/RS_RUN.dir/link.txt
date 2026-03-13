@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/RS_RUN.dir/src/main.cpp.o CMakeFiles/RS_RUN.dir/src/RS_Encoder.cpp.o CMakeFiles/RS_RUN.dir/src/RS_Decoder.cpp.o CMakeFiles/RS_RUN.dir/src/RS_tools.cpp.o -o RS_RUN 

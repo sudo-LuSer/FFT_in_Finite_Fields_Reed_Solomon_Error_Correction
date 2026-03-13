@@ -12,7 +12,7 @@ using namespace spu;
 using namespace spu::module;
 
 Encoder_RS::Encoder_RS(const int n, const int k, const int m)
-    : Stateful(), n(n), k(k), m(m), gf(m), RS_Enc(n,k)
+    : Stateful(), n(n), k(k), m(m), gf(m), RS_Enc(n,k, gf)
 {
     const std::string name = "Encoder_RS";
     this->set_name(name);
@@ -30,7 +30,6 @@ Encoder_RS::Encoder_RS(const int n, const int k, const int m)
                      frame_id);
         return runtime::status_t::SUCCESS;
     });
-    RS_Enc.build_generator(Encoder_RS :: gf);
     messages.resize(k,0); 
 }
 
@@ -45,7 +44,7 @@ void Encoder_RS::_process(const int* in, int* out, const int frame_id)
 {   
 
     spu :: tools :: Bit_packer :: pack(in, messages.data(), k*m, 1, false, m); 
-    CodeWord = RS_Enc.encode(messages, gf);
+    CodeWord = RS_Enc.encode(messages);
     spu :: tools :: Bit_packer :: unpack(CodeWord.data(), out, n*m, 1, false, m);
     // Minimal example: copy input to output and print trace
     // std::cout << "MyModule processing frame " << frame_id << std::endl;

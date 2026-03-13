@@ -31,7 +31,7 @@ using namespace spu::module;
         
         for(auto i = 0; i < frame_size; i++)
         {
-            if(input1[i] == input2[i]) {output[i] = 0; nb_err ++; }
+            if(input1[i] == input2[i]) {output[i] = 0;}
             else output[i] = 1;            
         }        
     }

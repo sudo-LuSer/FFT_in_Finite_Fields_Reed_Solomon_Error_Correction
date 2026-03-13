@@ -1,0 +1,22 @@
+[
+{
+  "directory": "/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/build",
+  "command": "/usr/bin/g++  -I/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/include -g -std=gnu++17 -o CMakeFiles/RS_RUN.dir/src/main.cpp.o -c /net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/src/main.cpp",
+  "file": "/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/src/main.cpp"
+},
+{
+  "directory": "/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/build",
+  "command": "/usr/bin/g++  -I/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/include -g -std=gnu++17 -o CMakeFiles/RS_RUN.dir/src/RS_Encoder.cpp.o -c /net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/src/RS_Encoder.cpp",
+  "file": "/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/src/RS_Encoder.cpp"
+},
+{
+  "directory": "/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/build",
+  "command": "/usr/bin/g++  -I/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/include -g -std=gnu++17 -o CMakeFiles/RS_RUN.dir/src/RS_Decoder.cpp.o -c /net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/src/RS_Decoder.cpp",
+  "file": "/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/src/RS_Decoder.cpp"
+},
+{
+  "directory": "/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/build",
+  "command": "/usr/bin/g++  -I/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/include -g -std=gnu++17 -o CMakeFiles/RS_RUN.dir/src/RS_tools.cpp.o -c /net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/src/RS_tools.cpp",
+  "file": "/net/netud/e/nhitar/Bureau/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/src/RS_tools.cpp"
+}
+]

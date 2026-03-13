@@ -1,0 +1,2 @@
+/usr/bin/ar qc librs_custom.a CMakeFiles/rs_custom.dir/src/custom/Comparator.cpp.o CMakeFiles/rs_custom.dir/src/custom/Decoder_RS.cpp.o CMakeFiles/rs_custom.dir/src/custom/Encoder_RS.cpp.o CMakeFiles/rs_custom.dir/src/custom/RS_Decoder.cpp.o CMakeFiles/rs_custom.dir/src/custom/RS_Encoder.cpp.o CMakeFiles/rs_custom.dir/src/custom/RS_tools.cpp.o
+/usr/bin/ranlib librs_custom.a

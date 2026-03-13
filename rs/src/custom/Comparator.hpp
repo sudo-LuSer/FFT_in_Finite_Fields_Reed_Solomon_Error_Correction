@@ -15,7 +15,6 @@ private:
     int frame_size;
 
 public:
-    int nb_err = 0; 
     Comparator(int frame_size);
     virtual ~Comparator();
 
