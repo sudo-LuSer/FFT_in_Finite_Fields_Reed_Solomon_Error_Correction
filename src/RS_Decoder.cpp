@@ -1,10 +1,5 @@
 #include "RS_Decoder.hpp"
 #include <algorithm>
-#include <complex>
-#include <cmath>
-
-using cd = std::complex<double>;
-const double PI = acos(-1);
 
 RS_Decoder::RS_Decoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(gf) {
     t = (n - k) / 2;
