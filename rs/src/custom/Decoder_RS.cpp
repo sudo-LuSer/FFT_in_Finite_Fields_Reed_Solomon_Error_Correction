@@ -41,14 +41,9 @@ Decoder_RS* Decoder_RS::clone() const
 
 void Decoder_RS::_process(const int* in, int* out, const int frame_id)
 {
+    spu::tools::Bit_packer::pack(in, CodeWord.data(), n*m, 1, false, m);
+    std::vector<int> ERR_Correc = RS_Dec.decode(CodeWord); 
 
-    spu :: tools :: Bit_packer :: pack(in, CodeWord.data(), n*m, 1, false, m); 
-
-    std :: vector <int> ERR_Correc = RS_Dec.decode(CodeWord);
-
-    spu :: tools :: Bit_packer :: unpack(ERR_Correc.data(), out, k*m, 1, false, m);
-
-    // Minimal example: copy input to output and print trace
-    // std::cout << "Decoder_RS processing frame " << frame_id << std::endl;
-    //std::copy(in, in + this->n_elmts, out);
+    const int* msg_start = ERR_Correc.data() + (n - k);
+    spu::tools::Bit_packer::unpack(msg_start, out, k*m, 1, false, m);
 }

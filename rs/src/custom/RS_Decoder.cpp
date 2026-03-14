@@ -3,6 +3,12 @@
 
 RS_Decoder::RS_Decoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(gf) {
     t = (n - k) / 2;
+    AlphaPow_reg.resize(2*t);
+    AlphaInv_reg.resize(n);
+    for(int i = 0; i < 2*t ; ++i)
+        AlphaPow_reg[i] = gf.get_alpha_to()[i+1];
+    for (int i = 0; i < n; ++i)
+        AlphaInv_reg[i] = gf.div(1, gf.get_alpha_to()[i]);
 }
 
 int RS_Decoder::poly_eval(const std::vector<int>& poly, int x) {
@@ -16,58 +22,50 @@ int RS_Decoder::poly_eval(const std::vector<int>& poly, int x) {
 std::vector<int> RS_Decoder::compute_syndromes(const std::vector<int>& received) {
     std::vector<int> syndromes(2*t, 0);
     for (int i = 0; i < 2*t; i++) {
-        int alpha_i = gf.get_alpha_to()[(i+1)]; 
-        syndromes[i] = poly_eval(received, alpha_i);
+        syndromes[i] = poly_eval(received, AlphaPow_reg[i]);
     }
     return syndromes;
 }
 
-std::vector<int> RS_Decoder::berlekamp_massey(const std::vector<int>& syndromes) {
-    int L = 0; 
-    std::vector<int> lambda(2*t + 1, 0);
-    lambda[0] = 1;
-    std::vector<int> b(2*t + 1, 0);
-    b[0] = 1;
+std::vector<int> RS_Decoder::berlekamp_massey(const std::vector<int>& s) {
+    int L = 0;
+    std::vector<int> C(2*t+1, 0), B(2*t+1, 0);
+    C[0] = 1; B[0] = 1;
     int m = 1;
-    for (int r = 0; r < 2*t; r++) { // Voir algo dans le doc
-        int d = syndromes[r];
-        for (int i = 1; i <= L; i++) {
-            d = gf.add(d, gf.mul(lambda[i], syndromes[r - i]));
-        }
-        if(d==0){
-            m++;
-        }
-        else if(2*L <= r){
-            std::vector<int> T = lambda;
-            for (int i = 0; (i<b.size()) && ((i + m) < lambda.size()); i++){
-                lambda[i + m] = gf.sub(lambda[i + m], gf.mul(d, b[i]));
-            }
-            L = r + 1 - L; b = T; m = 1; 
-
+    for (int r = 0; r < 2*t; ++r) {
+        int d = s[r];
+        for (int i = 1; i <= L; ++i)
+            d ^= gf.mul(C[i], s[r-i]); // xor = + Z/2Z
+        if (d == 0) {
+            ++m;
+        } 
+        else if (2*L <= r) {
+            auto D = C; 
+            for (int i = 0; i < (int)B.size() && i+m < (int)C.size(); ++i)
+                C[i+m] ^= gf.mul(d, B[i]);
+            L = r + 1 - L;
+            B = D;
+            m = 1;
             int inv_d = gf.div(1, d);
-            for (int &val : b)
-                val = gf.mul(val, inv_d);
+            for (int &val : B) val = gf.mul(val, inv_d);
         } 
         else{
-            for (int i = 0; (i<b.size()) && ((i + m) < lambda.size()); i++){
-                lambda[i + m] = gf.sub(lambda[i + m], gf.mul(d, b[i]));
-            }
-            m++;
+            for (int i = 0; i < (int)B.size() && i+m < (int)C.size(); ++i)
+                C[i+m] ^= gf.mul(d, B[i]);
+            ++m;
         }
     }
-    while (!lambda.empty() && lambda.back() == 0) 
-        lambda.pop_back();
-    return lambda;
+    C.resize(L+1);
+    return C;
 }
 
 std::vector<int> RS_Decoder::chien_search(const std::vector<int>& lambda, std::vector<int>& error_positions){
     error_positions.clear();
     std::vector<int> X;
     for (int i = 0; i < n; i++) {
-        int x = gf.div(1, gf.get_alpha_to()[i]);
-        if (poly_eval(lambda, x) == 0) {
+        if (poly_eval(lambda, AlphaInv_reg[i]) == 0) {
             error_positions.push_back(i);
-            X.push_back(x);             
+            X.push_back(AlphaInv_reg[i]);             
         }
     }
     return X;

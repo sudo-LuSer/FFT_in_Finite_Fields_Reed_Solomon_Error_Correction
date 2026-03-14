@@ -31,6 +31,14 @@ int main(int argc, char** argv)
     const int N = N_rs * m; // Total bits
     const int K = K_rs * m; // Info bits
 
+    // aff3ct :: tools :: RS_polynomial_generator R(N_rs, t); 
+
+    // std::cout << "Generator coefficients (index form): ";
+    // for (auto coef : R.get_g()) std::cout << coef << " ";
+    // std::cout << std::endl;
+
+    // return 0 ; 
+
     module::Source_random<> source(K);
     module::Finalizer    <> finalizer(N);
     module::Finalizer    <> finalizer_(K);
@@ -62,11 +70,11 @@ int main(int argc, char** argv)
     encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = cmp["compare::input2"];  
     cmp["compare :: output"] = finalizer["finalize::in"];
 
-    // encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::Y_N];
-    // decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::V_K] = cmp_["compare :: input1"]; 
-    // encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder_rs ["process::in"];
-    // decoder_rs["process :: out"] = cmp_["compare :: input2"];
-    // cmp_["compare::output"] = finalizer_["finalize::in"];
+    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::Y_N];
+    decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::V_K] = cmp_["compare :: input1"]; 
+    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder_rs ["process::in"];
+    decoder_rs["process :: out"] = cmp_["compare :: input2"];
+    cmp_["compare::output"] = finalizer_["finalize::in"];
 
     // 3. Sequence creation
     std::vector<runtime::Task*> first_tasks;
@@ -92,7 +100,7 @@ int main(int argc, char** argv)
     sequence.export_dot(file);
 
     // Run the sequence
-    for (auto i = 0; i < 1; i++)
+    for (auto i = 0; i < 100; i++)
         sequence.exec_seq(); // Run 1 frame at a time
 
     // 5. Stats

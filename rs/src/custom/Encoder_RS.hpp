@@ -13,8 +13,8 @@ class Encoder_RS : public Stateful
 {
 private:
     int n,k,m;
-    RS_Encoder RS_Enc;
     GaloisField gf;
+    RS_Encoder RS_Enc;
     std :: vector <int> messages;
     std :: vector <int> CodeWord;
 public:

@@ -39,11 +39,31 @@ private:
 public:
     GaloisField(int m);
     
-    int mul(int a, int b);
-    int div(int a, int b);
-    int add(int a, int b);
-    int sub(int a, int b);
-    int pow_gf(int a, int n);
+    inline int mul(int a, int b) {
+        if (a == 0 || b == 0) return 0;
+        int log_a = index_of[a];
+        int log_b = index_of[b];
+        int log_sum = (log_a + log_b);
+        return alpha_to[log_sum % (size -1)];
+    }
+    inline int div(int a, int b) {
+        if (b == 0) throw std :: invalid_argument("Division by zero");
+        if (a == 0) return 0;
+        int log_a = index_of[a];
+        int log_b = index_of[b];
+        int log_diff = (log_a - log_b + (size - 1)) % (size - 1);
+        return alpha_to[log_diff];
+    }
+
+    inline int add(int a, int b) { return a ^ b; }
+    inline int sub(int a, int b) { return a ^ b; }
+
+    inline int pow_gf(int a, int n) {
+        if (a == 0) return 0;
+        int log_a = index_of[a];
+        int log_res = (log_a * (n % (size - 1))) % (size - 1);
+        return alpha_to[log_res];
+    }
 
     const std :: vector<int>& get_alpha_to() const;
     const std :: vector<int>& get_index_of() const;

@@ -1,6 +1,8 @@
 #include "RS_Encoder.hpp"
 #include "RS_tools.hpp"
 
+#include <algorithm>
+
 RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf){
     if (n <= k)
         throw std::invalid_argument("n must be greater than k");
@@ -13,10 +15,19 @@ RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf){
 
     int start_deg = 1;
 
-    for (int i = start_deg; i <= start_deg + (n - k); i++){
+    for (int i = start_deg; i < start_deg + (n - k); i++){
         int alpha_i = gf.get_alpha_to()[i];
         generator = poly_mult_by_binomial(generator, alpha_i);
     }
+
+    // std::vector<int> coeffs_index = {136, 15, 30, 26, 23, 29, 224, 53, 125, 36, 190, 233, 210, 196, 183, 151, 0};
+    // generator.clear();
+    // for (int idx : coeffs_index) {
+    //     if (idx == -1)
+    //         generator.push_back(0);
+    //     else
+    //         generator.push_back(gf.get_alpha_to()[idx]);
+    // }
 }
 
 std::vector<int> RS_Encoder::poly_mult_by_binomial(const std::vector<int>& poly, int a)
@@ -70,7 +81,6 @@ std::vector<int> RS_Encoder::encode(const std::vector<int>& message){
         throw std::invalid_argument("Message length must be k = " + std::to_string(k));
 
     int r = n - k;
-
     std::vector<int> parity(r, 0);
 
     for (int i = k - 1; i >= 0; i--){
@@ -93,6 +103,5 @@ std::vector<int> RS_Encoder::encode(const std::vector<int>& message){
 
     std::vector<int> codeword = parity;
     codeword.insert(codeword.end(), message.begin(), message.end());
-
     return codeword;
 }
