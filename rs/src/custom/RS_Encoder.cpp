@@ -1,32 +1,35 @@
 #include "RS_Encoder.hpp"
 #include "RS_tools.hpp"
-#include <iostream>
 
-RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k),gf(&gf) {
-    if (n <= k) {
-        throw std :: invalid_argument("n must be greater than k");
-    }
-    t = (n - k) / 2; 
+RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf){
+    if (n <= k)
+        throw std::invalid_argument("n must be greater than k");
+
+    t = (n - k) / 2;
+
     generator.push_back(1);
-    int start_root = 1;
-    for (int i = start_root; i < start_root + (n - k); i++) {
-        int alpha_i = gf.get_alpha_to()[i % (gf.get_size() - 1)];
-        std :: cout << alpha_i << std :: endl; 
+
+    // à faire : init de la variable start_deg avec une LOOK UP TABLE
+
+    int start_deg = 1;
+
+    for (int i = start_deg; i <= start_deg + (n - k); i++){
+        int alpha_i = gf.get_alpha_to()[i];
         generator = poly_mult_by_binomial(generator, alpha_i);
     }
 }
 
-std :: vector<int> RS_Encoder::poly_mult_by_binomial(const std :: vector<int>& poly, int a) {
-    size_t degree = poly.size();
-    std :: vector<int> result(degree + 1, 0);
-    
-    for (size_t j = 0; j < degree; j++) {
-        result[j + 1] = poly[j];
-    }
+std::vector<int> RS_Encoder::poly_mult_by_binomial(const std::vector<int>& poly, int a)
+{
+    std::vector<int> result(poly.size() + 1, 0);
 
-    for (size_t j = 0; j < degree; j++) {
-        result[j] = poly[j] != 0 ? gf->add(result[j], gf->mul(poly[j], a)) : result[j];
-    }
+    result[0] = gf->mul(poly[0], a);
+
+    for(size_t i = 1; i < poly.size(); i++)
+        result[i] = gf->add(gf->mul(poly[i], a), poly[i-1]);
+
+    result[poly.size()] = poly.back();
+
     return result;
 }
 
@@ -62,23 +65,34 @@ std :: vector<int> RS_Encoder::poly_div(const std :: vector<int>& dividend, cons
     return remainder;
 }
 
-std :: vector<int> RS_Encoder::encode(const std :: vector<int>& message) {
-    if (message.size() != (size_t)k) {
-        throw std :: invalid_argument("Message length must be k = " + std :: to_string(k));
+std::vector<int> RS_Encoder::encode(const std::vector<int>& message){
+    if (message.size() != (size_t)k)
+        throw std::invalid_argument("Message length must be k = " + std::to_string(k));
+
+    int r = n - k;
+
+    std::vector<int> parity(r, 0);
+
+    for (int i = k - 1; i >= 0; i--){
+        int feedback = gf->add(message[i], parity[r - 1]);
+        if (feedback != 0){
+            for (int j = r - 1; j > 0; j--){
+                if (generator[j] != 0)
+                    parity[j] = gf->add(parity[j - 1], gf->mul(feedback, generator[j]));
+                else
+                    parity[j] = parity[j - 1];
+            }
+            parity[0] = gf->mul(feedback, generator[0]);
+        }
+        else{
+            for (int j = r - 1; j > 0; j--)
+                parity[j] = parity[j - 1];
+            parity[0] = 0;
+        }
     }
-    
-    std::vector<int> mx_poly(n, 0);   
-    std::copy(message.begin(), message.end(), mx_poly.begin() + (n - k));
-    std :: vector<int> remainder = poly_div(mx_poly, generator);
-    
-    remainder.resize(n - k, 0);
-    
-    std :: vector<int> codeword = remainder;
+
+    std::vector<int> codeword = parity;
     codeword.insert(codeword.end(), message.begin(), message.end());
-    
-    if (codeword.size() != (size_t)n) {
-        throw std :: runtime_error("Codeword length incorrect");
-    }
-    
+
     return codeword;
 }
