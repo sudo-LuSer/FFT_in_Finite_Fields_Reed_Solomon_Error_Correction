@@ -1,66 +1,111 @@
-#include "RS_Encoder.hpp"
-#include "RS_tools.hpp"
-#include "RS_Decoder.hpp"
+
 #include <iostream>
-#include <chrono>
+#include <vector>
+#include <memory>
+#include <fstream>
+#include <streampu.hpp>
 
-#define pb push_back
+#include <aff3ct.hpp>
 
-int main(){
-    GaloisField gf(8);
-    std :: vector <int> messages;
-    int n = 255, k = 3; 
-    for(int i = 1;i <= k; i++)
-        messages.pb(gf.get_alpha_to()[gf.get_index_of()[i]]);
-    auto start_total = std::chrono::high_resolution_clock::now();
-    RS_Encoder RS_Enc(n,k);
-    RS_Enc.build_generator(gf);
-    std :: cout << std :: endl; 
-    std :: cout << std :: endl;
-    auto start_encode = std::chrono::high_resolution_clock::now();
-    std :: vector <int> CodeWord = RS_Enc.encode(messages, gf); 
-    auto end_encode = std::chrono::high_resolution_clock::now();
-    // Encoder
-    std :: cout << "Codeword: ";
-    for(auto x : CodeWord)
-        std :: cout << x << " ";
-    std :: cout << std :: endl;
-    std :: cout << std :: endl; 
+#include "custom/Comparator.hpp"
 
-    /// injection d'erreur 
+#include "custom/Encoder_RS.hpp"
+#include "custom/Decoder_RS.hpp"
 
-    // CodeWord[0] = gf.add(CodeWord[0], 1); 
-    // CodeWord[1] = gf.add(CodeWord[1], 1); 
-    // CodeWord[2] = gf.add(CodeWord[2], 1);
-    // CodeWord[3] = gf.add(CodeWord[3], 1); 
-    // CodeWord[4] = gf.add(CodeWord[4], 1); 
-    // CodeWord[5] = gf.add(CodeWord[5], 1);
-    // CodeWord[6] = gf.add(CodeWord[6], 1); 
-    // CodeWord[7] = gf.add(CodeWord[7], 1);
-    //CodeWord[8] = gf.add(CodeWord[8], 1);
+using namespace spu;
+using namespace spu::module;
 
-    // Decodage
+int main(int argc, char** argv)
+{
+    std::cout << "Starting Hulotte project..." << std::endl;
 
-    std :: cout << "Sortie du décodeur :"; 
 
-    RS_Decoder RS_Dec(n, k, gf); 
-    auto start_decode = std::chrono::high_resolution_clock::now();
-    std :: vector <int> ERR_Correc = RS_Dec.decode(CodeWord);
-    auto end_decode = std::chrono::high_resolution_clock::now();
+    // 1. Modules creation
     
-    auto end_total = std::chrono::high_resolution_clock::now();
-    
-    for(auto x : ERR_Correc)
-        std :: cout << x << " "; 
-    
-    std :: cout << std :: endl; 
+    // RS(7, 5) => t=1, m=3. Bits 21 -> 15.
+    // NOTE: This uses aff3ct B_32 (32-bit integer) template instantiation.
+    const int N_rs = 255;  // Symbols
+    const int K_rs = 239;  // Symbols
+    const int m = 8;       // Bits per symbol
+    const int t = (N_rs - K_rs) / 2; // Correction 
+    const int N = N_rs * m; // Total bits
+    const int K = K_rs * m; // Info bits
 
-    auto duration_encode = std::chrono::duration_cast<std::chrono::microseconds>(end_encode - start_encode);
-    auto duration_decode = std::chrono::duration_cast<std::chrono::microseconds>(end_decode - start_decode);
-    auto duration_total = std::chrono::duration_cast<std::chrono::microseconds>(end_total - start_total);
+    // aff3ct :: tools :: RS_polynomial_generator R(N_rs, t); 
+
+    // std::cout << "Generator coefficients (index form): ";
+    // for (auto coef : R.get_g()) std::cout << coef << " ";
+    // std::cout << std::endl;
+
+    // return 0 ; 
+
+    module::Source_random<> source(K);
+    module::Finalizer    <> finalizer(N);
+    module::Finalizer    <> finalizer_(K);
+
+    module::Comparator cmp(N); 
+    module::Comparator cmp_(K); 
     
-    std::cout << "\n--- Temps de calcul ---" << std::endl;
-    std::cout << "Encodage complet : " << duration_encode.count() << " micros" << std::endl;
-    std::cout << "Décodage : " << duration_decode.count() << " micros" << std::endl;
-    std::cout << "Temps total : " << duration_total.count() << " micros" << std::endl;
+    // Create RS Polynomial Generator (needed for RS construction)
+    aff3ct::tools::RS_polynomial_generator poly(N_rs, t);
+    
+    // Create Encoder and Decoder
+    aff3ct::module::Encoder_RS<>     encoder(K_rs, N_rs, poly);
+    aff3ct::module::Decoder_RS_std<> decoder(K_rs, N_rs, poly);    
+
+    
+    module::Encoder_RS         encoder_rs(N_rs, K_rs, m);
+    module::Decoder_RS         decoder_rs(N_rs, K_rs, m);
+
+    // 2. Sockets binding
+    using namespace aff3ct::module;
+    using namespace aff3ct::tools;
+    
+    // Chain construction
+    
+    // Chain: Source -> (Custom Module) -> Encoder
+    source   [src::tsk::generate][(int)src::sck::generate::out_data] =  encoder_rs ["process::in"];
+    encoder_rs ["process::out"] = cmp["compare :: input1"]; //finalizer["finalize::in"]; //  encoder  [enc::tsk::encode][(int)enc::sck::encode::U_K];
+    source   [src::tsk::generate][(int)src::sck::generate::out_data] = encoder  [enc::tsk::encode][(int)enc::sck::encode::U_K];
+    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = cmp["compare::input2"];  
+    cmp["compare :: output"] = finalizer["finalize::in"];
+
+    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::Y_N];
+    decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::V_K] = cmp_["compare :: input1"]; 
+    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder_rs ["process::in"];
+    decoder_rs["process :: out"] = cmp_["compare :: input2"];
+    cmp_["compare::output"] = finalizer_["finalize::in"];
+
+    // 3. Sequence creation
+    std::vector<runtime::Task*> first_tasks;
+
+    first_tasks.push_back(&source("generate"));
+
+
+    runtime::Sequence sequence(first_tasks);
+
+    // Configuration
+    for (auto& type : sequence.get_tasks_per_types())
+        for (auto& t : type)
+        {
+            t->set_stats(true);
+            t->set_debug(true);
+        }
+
+    // 4. Execution
+    std::cout << "Processing..." << std::endl;
+    
+    // Export dot file for visualization
+    std::ofstream file("graph.dot");
+    sequence.export_dot(file);
+
+    // Run the sequence
+    for (auto i = 0; i < 100; i++)
+        sequence.exec_seq(); // Run 1 frame at a time
+
+    // 5. Stats
+    std::cout << "\\nEnd of execution." << std::endl;
+    tools::Stats::show(sequence.get_tasks_per_types(), true, false);
+
+    return 0;
 }
