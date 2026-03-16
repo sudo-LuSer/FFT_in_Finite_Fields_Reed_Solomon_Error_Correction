@@ -19,9 +19,11 @@ public:
     const std :: vector<int>& get_generator() const { return generator; }
     int get_degree() const { return generator.empty() ? 0 : (int)generator.size() - 1; }
     
-    std :: vector<int> encode(const std :: vector<int>& message);
-    std :: vector<int> poly_div(const std :: vector<int>& dividend, const std :: vector<int>& divisor);
     std :: vector<int> poly_mult_by_binomial(const std :: vector<int>& poly, int a);
+
+    std :: vector<int> encode(const std :: vector<int>& message);
+
+    // std :: vector<int> poly_div(const std :: vector<int>& dividend, const std :: vector<int>& divisor);
 };
 
 #endif

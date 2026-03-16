@@ -44,37 +44,37 @@ std::vector<int> RS_Encoder::poly_mult_by_binomial(const std::vector<int>& poly,
     return result;
 }
 
-std :: vector<int> RS_Encoder::poly_div(const std :: vector<int>& dividend, const std :: vector<int>& divisor) {
-    std :: vector<int> remainder = dividend;
-    int deg_d = (int)divisor.size() - 1;
+// std :: vector<int> RS_Encoder::poly_div(const std :: vector<int>& dividend, const std :: vector<int>& divisor) {
+//     std :: vector<int> remainder = dividend;
+//     int deg_d = (int)divisor.size() - 1;
     
-    if (divisor.empty() || divisor[deg_d] == 0) {
-        throw std :: invalid_argument("Divisor polynomial is zero or invalid");
-    }
+//     if (divisor.empty() || divisor[deg_d] == 0) {
+//         throw std :: invalid_argument("Divisor polynomial is zero or invalid");
+//     }
     
-    while(remainder.size() >= divisor.size() && !remainder.empty()) {
-        int deg_r = (int)remainder.size() - 1;
-        int shift = deg_r - deg_d;
+//     while(remainder.size() >= divisor.size() && !remainder.empty()) {
+//         int deg_r = (int)remainder.size() - 1;
+//         int shift = deg_r - deg_d;
         
-        int coef = gf->div(remainder[deg_r], divisor[deg_d]);
+//         int coef = gf->div(remainder[deg_r], divisor[deg_d]);
         
-        for(int i = 0; i <= deg_d; i++) {
-            if (i + shift < (int)remainder.size()) {
-                remainder[i + shift] = gf->sub(remainder[i + shift], gf->mul(coef, divisor[i]));
-            }
-        }
+//         for(int i = 0; i <= deg_d; i++) {
+//             if (i + shift < (int)remainder.size()) {
+//                 remainder[i + shift] = gf->sub(remainder[i + shift], gf->mul(coef, divisor[i]));
+//             }
+//         }
         
-        while(!remainder.empty() && remainder.back() == 0) {
-            remainder.pop_back();
-        }
-    }
+//         while(!remainder.empty() && remainder.back() == 0) {
+//             remainder.pop_back();
+//         }
+//     }
     
-    if (remainder.empty()) {
-        return {0};
-    }
+//     if (remainder.empty()) {
+//         return {0};
+//     }
     
-    return remainder;
-}
+//     return remainder;
+// }
 
 std::vector<int> RS_Encoder::encode(const std::vector<int>& message){
     if (message.size() != (size_t)k)
@@ -85,20 +85,10 @@ std::vector<int> RS_Encoder::encode(const std::vector<int>& message){
 
     for (int i = k - 1; i >= 0; i--){
         int feedback = gf->add(message[i], parity[r - 1]);
-        if (feedback != 0){
-            for (int j = r - 1; j > 0; j--){
-                if (generator[j] != 0)
-                    parity[j] = gf->add(parity[j - 1], gf->mul(feedback, generator[j]));
-                else
-                    parity[j] = parity[j - 1];
-            }
-            parity[0] = gf->mul(feedback, generator[0]);
+        for (int j = r - 1; j > 0; j--){
+                parity[j] = gf->add(parity[j - 1], gf->mul(feedback, generator[j]));
         }
-        else{
-            for (int j = r - 1; j > 0; j--)
-                parity[j] = parity[j - 1];
-            parity[0] = 0;
-        }
+        parity[0] = gf->mul(feedback, generator[0]);
     }
 
     std::vector<int> codeword = parity;

@@ -72,7 +72,8 @@ int main(int argc, char** argv)
 
     encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::Y_N];
     decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::V_K] = cmp_["compare :: input1"]; 
-    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder_rs ["process::in"];
+    // encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder_rs ["process::in"];
+    encoder_rs ["process :: out"] = decoder_rs["process :: in"];
     decoder_rs["process :: out"] = cmp_["compare :: input2"];
     cmp_["compare::output"] = finalizer_["finalize::in"];
 
@@ -100,7 +101,7 @@ int main(int argc, char** argv)
     sequence.export_dot(file);
 
     // Run the sequence
-    for (auto i = 0; i < 100; i++)
+    for (auto i = 0; i < 3; i++)
         sequence.exec_seq(); // Run 1 frame at a time
 
     // 5. Stats
