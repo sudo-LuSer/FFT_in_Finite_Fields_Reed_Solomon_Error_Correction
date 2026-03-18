@@ -2,7 +2,7 @@
 #include "RS_tools.hpp"
 
 // #include <algorithm>
-#include <immintrin.h>
+// #include <immintrin.h>
 
 RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf){
     if (n <= k)
