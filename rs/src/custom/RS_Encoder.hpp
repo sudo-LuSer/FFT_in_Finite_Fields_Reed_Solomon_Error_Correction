@@ -24,6 +24,9 @@ public:
     std :: vector<int> encode(const std :: vector<int>& message);
 
     // std :: vector<int> poly_div(const std :: vector<int>& dividend, const std :: vector<int>& divisor);
+
+protected: 
+    std::vector<std::vector<int>> mul_table;
 };
 
 #endif

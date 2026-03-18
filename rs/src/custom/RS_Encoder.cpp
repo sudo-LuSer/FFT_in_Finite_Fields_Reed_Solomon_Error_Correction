@@ -1,7 +1,8 @@
 #include "RS_Encoder.hpp"
 #include "RS_tools.hpp"
 
-#include <algorithm>
+// #include <algorithm>
+#include <immintrin.h>
 
 RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf){
     if (n <= k)
@@ -28,6 +29,15 @@ RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf){
     //     else
     //         generator.push_back(gf.get_alpha_to()[idx]);
     // }
+
+    int r = n - k;
+    mul_table.resize(r, std::vector<int>(256));
+
+    for (int j = 0; j < r; j++) {
+        for (int x = 0; x < 256; x++) {
+            mul_table[j][x] = gf.mul(x, generator[j]);
+        }
+    }
 }
 
 std::vector<int> RS_Encoder::poly_mult_by_binomial(const std::vector<int>& poly, int a)
@@ -85,10 +95,12 @@ std::vector<int> RS_Encoder::encode(const std::vector<int>& message){
 
     for (int i = k - 1; i >= 0; i--){
         int feedback = gf->add(message[i], parity[r - 1]);
+
         for (int j = r - 1; j > 0; j--){
-                parity[j] = gf->add(parity[j - 1], gf->mul(feedback, generator[j]));
+            parity[j] = gf->add(parity[j - 1], mul_table[j][feedback]);
         }
-        parity[0] = gf->mul(feedback, generator[0]);
+
+        parity[0] = mul_table[0][feedback];
     }
 
     std::vector<int> codeword = parity;
