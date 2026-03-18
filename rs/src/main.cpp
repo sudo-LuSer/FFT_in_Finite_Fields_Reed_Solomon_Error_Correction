@@ -70,12 +70,12 @@ int main(int argc, char** argv)
     encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = cmp["compare::input2"];  
     cmp["compare :: output"] = finalizer["finalize::in"];
 
-    // encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::Y_N];
-    // decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::V_K] = cmp_["compare :: input1"]; 
-    // // encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder_rs ["process::in"];
-    // encoder_rs ["process :: out"] = decoder_rs["process :: in"];
-    // decoder_rs["process :: out"] = cmp_["compare :: input2"];
-    // cmp_["compare::output"] = finalizer_["finalize::in"];
+    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::Y_N];
+    decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::V_K] = cmp_["compare :: input1"]; 
+    // encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder_rs ["process::in"];
+    encoder_rs ["process :: out"] = decoder_rs["process :: in"];
+    decoder_rs["process :: out"] = cmp_["compare :: input2"];
+    cmp_["compare::output"] = finalizer_["finalize::in"];
 
     // 3. Sequence creation
     std::vector<runtime::Task*> first_tasks;

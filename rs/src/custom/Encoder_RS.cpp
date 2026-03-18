@@ -45,7 +45,7 @@ void Encoder_RS::_process(const int* in, int* out, const int frame_id)
 {   
 
     spu :: tools :: Bit_packer :: pack(in, messages.data(), k*m, 1, false, m); 
-    CodeWord = RS_Enc.encode(messages);
+    RS_Enc.encode(messages, CodeWord);
     spu :: tools :: Bit_packer :: unpack(CodeWord.data(), out, n*m, 1, false, m);
     // Minimal example: copy input to output and print trace
     // std::cout << "MyModule processing frame " << frame_id << std::endl;

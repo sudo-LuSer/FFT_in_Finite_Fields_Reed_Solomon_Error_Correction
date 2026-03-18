@@ -4,7 +4,7 @@
 // #include <algorithm>
 // #include <immintrin.h>
 
-RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf){
+RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf) {
     if (n <= k)
         throw std::invalid_argument("n must be greater than k");
 
@@ -12,30 +12,20 @@ RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf){
 
     generator.push_back(1);
 
-    // à faire : init de la variable start_deg avec une LOOK UP TABLE
+    int start_deg = 1;   // À remplacer par une LUT si nécessaire
 
-    int start_deg = 1;
-
-    for (int i = start_deg; i < start_deg + (n - k); i++){
+    for (int i = start_deg; i < start_deg + (n - k); i++) {
         int alpha_i = gf.get_alpha_to()[i];
         generator = poly_mult_by_binomial(generator, alpha_i);
     }
 
-    // std::vector<int> coeffs_index = {136, 15, 30, 26, 23, 29, 224, 53, 125, 36, 190, 233, 210, 196, 183, 151, 0};
-    // generator.clear();
-    // for (int idx : coeffs_index) {
-    //     if (idx == -1)
-    //         generator.push_back(0);
-    //     else
-    //         generator.push_back(gf.get_alpha_to()[idx]);
-    // }
-
     int r = n - k;
-    mul_table.resize(r, std::vector<int>(256));
+
+    mul_table.resize(r * (n + 1));
 
     for (int j = 0; j < r; j++) {
-        for (int x = 0; x < 256; x++) {
-            mul_table[j][x] = gf.mul(x, generator[j]);
+        for (int x = 0; x < n + 1; x++) {
+            mul_table[j * (n + 1) + x] = gf.mul(x, generator[j]);
         }
     }
 }
@@ -86,7 +76,7 @@ std::vector<int> RS_Encoder::poly_mult_by_binomial(const std::vector<int>& poly,
 //     return remainder;
 // }
 
-std::vector<int> RS_Encoder::encode(const std::vector<int>& message){
+void RS_Encoder::encode(const std::vector<int>& message, std :: vector <int> &codeword){
     if (message.size() != (size_t)k)
         throw std::invalid_argument("Message length must be k = " + std::to_string(k));
 
@@ -97,13 +87,13 @@ std::vector<int> RS_Encoder::encode(const std::vector<int>& message){
         int feedback = gf->add(message[i], parity[r - 1]);
 
         for (int j = r - 1; j > 0; j--){
-            parity[j] = gf->add(parity[j - 1], mul_table[j][feedback]);
+            parity[j] = gf->add(parity[j - 1], mul_table[j*(n+1) + feedback]);
         }
 
-        parity[0] = mul_table[0][feedback];
+        parity[0] = mul_table[feedback];
     }
 
-    std::vector<int> codeword = parity;
-    codeword.insert(codeword.end(), message.begin(), message.end());
-    return codeword;
+    codeword.resize(n);
+    std::copy(parity.begin(), parity.end(), codeword.begin());
+    std::copy(message.begin(), message.end(), codeword.begin() + r);
 }

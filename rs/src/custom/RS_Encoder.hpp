@@ -12,7 +12,7 @@ private:
     int t;             
     std :: vector<int> generator; 
     GaloisField *gf; 
-    
+    std::vector<int> mul_table; 
 public: 
     RS_Encoder(int n, int k, GaloisField &gf);
     
@@ -21,12 +21,9 @@ public:
     
     std :: vector<int> poly_mult_by_binomial(const std :: vector<int>& poly, int a);
 
-    std :: vector<int> encode(const std :: vector<int>& message);
+    void encode(const std::vector<int>& message, std :: vector <int> &codeword);
 
     // std :: vector<int> poly_div(const std :: vector<int>& dividend, const std :: vector<int>& divisor);
-
-protected: 
-    std::vector<std::vector<int>> mul_table;
 };
 
 #endif
