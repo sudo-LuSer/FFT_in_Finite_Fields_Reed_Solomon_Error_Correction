@@ -4,6 +4,9 @@
 #include <cstdint>
 #include <stdexcept>
 
+#define GF_ADD(a,b) ((a) ^ (b))
+#define GF_SUB(a,b) ((a) ^ (b))
+
 const uint32_t poly_masks[21] = {
     0,          // m=0 (non utilisé)
     0,          // m=1 (non utilisé)
@@ -57,6 +60,7 @@ public:
 
     inline int add(int a, int b) { return a ^ b; }
     inline int sub(int a, int b) { return a ^ b; }
+    inline int inv(int a){return alpha_to[(size - 1) - index_of[a]];}
 
     inline int pow_gf(int a, int n) {
         if (a == 0) return 0;

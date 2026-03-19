@@ -1,6 +1,7 @@
 #include "RS_Encoder.hpp"
 #include "RS_tools.hpp"
 
+// #include <aff3ct.hpp>
 // #include <algorithm>
 // #include <immintrin.h>
 
@@ -10,11 +11,14 @@ RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf) {
 
     t = (n - k) / 2;
 
+    // aff3ct::tools :: RS_polynomial_generator rs_g(n,t);
+    // generator = rs_g.get_g();
+
     generator.push_back(1);
 
-    int start_deg = 1;   // À remplacer par une LUT si nécessaire
+    int start_deg = 1;   //remplacer par une LUT si nécessaire
 
-    for (int i = start_deg; i < start_deg + (n - k); i++) {
+    for (int i = 1; i <= (n - k); i++) {
         int alpha_i = gf.get_alpha_to()[i];
         generator = poly_mult_by_binomial(generator, alpha_i);
     }
@@ -37,7 +41,7 @@ std::vector<int> RS_Encoder::poly_mult_by_binomial(const std::vector<int>& poly,
     result[0] = gf->mul(poly[0], a);
 
     for(size_t i = 1; i < poly.size(); i++)
-        result[i] = gf->add(gf->mul(poly[i], a), poly[i-1]);
+        result[i] = GF_ADD(gf->mul(poly[i], a), poly[i-1]);
 
     result[poly.size()] = poly.back();
 
@@ -84,10 +88,10 @@ void RS_Encoder::encode(const std::vector<int>& message, std :: vector <int> &co
     std::vector<int> parity(r, 0);
 
     for (int i = k - 1; i >= 0; i--){
-        int feedback = gf->add(message[i], parity[r - 1]);
+        int feedback = GF_ADD(message[i], parity[r - 1]);
 
         for (int j = r - 1; j > 0; j--){
-            parity[j] = gf->add(parity[j - 1], mul_table[j*(n+1) + feedback]);
+            parity[j] = GF_ADD(parity[j - 1], mul_table[j*(n+1) + feedback]);
         }
 
         parity[0] = mul_table[feedback];
