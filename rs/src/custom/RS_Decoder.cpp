@@ -98,10 +98,10 @@ std::vector<int> RS_Decoder::chien_search(
 
     std::vector<int> reg(lambda);
 
-    for (int i = 0; i < n; ++i) {
+    for (int i = 0; i < n; i++){
         int sum = 0;
 
-        for (int j = 0; j <= L; ++j)
+        for (int j = 0; j <= L; j++)
             sum ^= reg[j];
 
         if (sum == 0) {
@@ -109,8 +109,8 @@ std::vector<int> RS_Decoder::chien_search(
             X.push_back(AlphaInv_reg[i]);
         }
 
-        for (int j = 1; j <= L; ++j)
-                reg[j] = gf.mul(reg[j], AlphaInv_reg[1]);
+        for (int j = 1; j <= L; j++)
+                reg[j] = gf.mul(reg[j], AlphaInv_reg[j]);
     }
 
     return X;
