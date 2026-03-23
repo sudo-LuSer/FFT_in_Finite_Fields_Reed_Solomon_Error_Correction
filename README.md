@@ -13,16 +13,13 @@ Reed–Solomon codes are widely used in **digital communication and storage syst
 ```
 projet_ECC/
 │
-├── doc/                # Documentation (subject, diagrams, references)
+├── doc/                # Documentation (subject,proposition , references)
 ├── include/            # C++ header files (.hpp)
 ├── src/                # C++ source files (.cpp)
+├── rs/                 # Updated files (use them on piriority) 
 ├── matlab/             # MATLAB validation scripts
-├── vhdl/               # (future work) VHDL implementation for FPGA
-├── test/               # Optional unit tests
-├── obj/                # Object files generated during compilation
-├── build/              # Build artifacts (ignored by git)
+├── rs_encoder/         # (future work) VHDL implementation for FPGA
 │
-├── Makefile            # Build configuration
 └── README.md           # Project documentation
 ```
 
