@@ -1,0 +1,5 @@
+INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/HP_PC/Desktop/Workspace/Projet thematique/VHDL/EncoderDecoderRS/EncoderDecoderRS.srcs/sources_1/new/rs_pkg.vhd" into library xil_defaultlib
+INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/HP_PC/Desktop/Workspace/Projet thematique/VHDL/EncoderDecoderRS/EncoderDecoderRS.srcs/sources_1/new/RS_ENCODER.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'rs_encoder'
+INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/HP_PC/Desktop/Workspace/Projet thematique/VHDL/EncoderDecoderRS/EncoderDecoderRS.srcs/sim_1/new/tb_rs_encoder.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'tb_rs_encoder'
