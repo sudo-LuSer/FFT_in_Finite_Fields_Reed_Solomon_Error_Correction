@@ -9,9 +9,8 @@ package rs_pkg is
     type gf_array_t is array (0 to N_RDNCY-1) of std_logic_vector(2 downto 0);
     
     -- RS(7,5) dans GF(2^3)
-    -- g(x) = x^4 + (alpha^2+alpha)*x + (alpha+1). En binaire : 6="110", 3="011"
-    constant G_COEF : gf_array_t := ("011", "001", "010", "011");
-    
+    -- g(x) = x^2 + (alpha^2+alpha)*x + (alpha+1). En binaire : 6="110", 3="011"
+    constant G_COEF : gf_array_t := ("011", "010", "001", "011");    
     -- Multiplication dans GF(2^3)
     function gf_mult_3(a : std_logic_vector(2 downto 0); b : std_logic_vector(2 downto 0)) return std_logic_vector;
 end package rs_pkg;
