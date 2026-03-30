@@ -18,7 +18,7 @@ projet_ECC/
 ├── src/                # C++ source files (.cpp)
 ├── rs/                 # Updated files (use them on piriority) 
 ├── matlab/             # MATLAB validation scripts
-├── rs_encoder/         # (future work) VHDL implementation for FPGA
+├── VHDL/               # VHDL implementation for FPGA for simple polynomial
 │
 └── README.md           # Project documentation
 ```
@@ -48,6 +48,9 @@ To compile and run the project, you need:
   - GCC ≥ 7
   - Clang ≥ 5
   - MSVC ≥ 2017
+
+- **Program supporting VHDL simulations**
+  - Vivado
 
 - **Make**
 
@@ -203,6 +206,22 @@ This allows verification of:
 - finite field arithmetic
 
 ---
+
+# VHDL implementation
+
+Testbench :
+VHDL/EncoderDecoderRS/EncoderDecoderRS.srcs/sim_1/new/tb_rs_encoder.vhd
+
+This will test the encoding process for a simple polynomial :
+RS(7, 3)
+G(x) = x^4 + 3x^3 + x^2 + 2x + 3
+Primitif polynomial : x^3 + x + 1
+
+We send the following message : "1, 2, 3"
+
+The output simulates the encoded message - for each cycle we output 1 symbol (data_out)
+
+valid_out stays high while we output the encoded message : 1,2,3,5,6,1,6
 
 # Performance Measurement
 

@@ -15,7 +15,6 @@ end rs_encoder;
 
 architecture Behavioral of rs_encoder is
     
-    -- 3 registers for the parity LFSR
     signal lfsr : gf_array_t := (others => (others => '0'));
     signal feedback_sym : std_logic_vector(2 downto 0);
     

@@ -3,12 +3,10 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity tb_rs_encoder is
--- Testbench entities are always empty!
 end tb_rs_encoder;
 
 architecture Behavioral of tb_rs_encoder is
 
-    -- 1. Declare the Component we are testing (The DUT: Device Under Test)
     component rs_encoder
         Port ( 
             clk         : in  std_logic;
@@ -74,8 +72,8 @@ begin
         data_in <= "011"; -- Symbol 3
         wait for clk_period;
         
-        data_in <= "100"; -- Symbol 4
-        wait for clk_period;
+        --data_in <= "100"; -- Symbol 4
+        --wait for clk_period;    
 
         -- Step C: Enter the OUT_PARITY phase (Wait for N-K=3 parity symbols)
         -- We drop enable, and the encoder will automatically push out the parity
