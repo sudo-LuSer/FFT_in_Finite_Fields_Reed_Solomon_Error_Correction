@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef RS_TOOLS_H
 #define RS_TOOLS_H
 #include <vector>

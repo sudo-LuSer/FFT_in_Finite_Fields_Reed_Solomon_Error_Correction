@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef RS_ENCODER_HPP
 #define RS_ENCODER_HPP
 #define RS_ENCODER_HPP
