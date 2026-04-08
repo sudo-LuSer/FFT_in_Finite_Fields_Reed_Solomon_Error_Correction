@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef RS_ENCODER_HPP
 #define RS_ENCODER_HPP
 #define RS_ENCODER_HPP
@@ -13,6 +15,7 @@ private:
     std :: vector<int> generator; 
     GaloisField *gf; 
     std::vector<int> mul_table; 
+    std::vector<std::vector<int>> slice_tables; 
 public: 
     RS_Encoder(int n, int k, GaloisField &gf);
     

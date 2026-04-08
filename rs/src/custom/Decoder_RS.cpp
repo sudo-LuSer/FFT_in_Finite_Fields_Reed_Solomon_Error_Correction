@@ -39,11 +39,10 @@ Decoder_RS* Decoder_RS::clone() const
     return m;
 }
 
-void Decoder_RS::_process(const int* in, int* out, const int frame_id)
-{
+void Decoder_RS::_process(const int* in, int* out, const int frame_id) {
     spu::tools::Bit_packer::pack(in, CodeWord.data(), n*m, 1, false, m);
-    std::vector<int> ERR_Correc = RS_Dec.decode(CodeWord); 
-
-    const int* msg_start = ERR_Correc.data() + (n - k);
-    spu::tools::Bit_packer::unpack(msg_start, out, k*m, 1, false, m);
+    std::vector<int> corrected_codeword = RS_Dec.decode(CodeWord);
+    //(message systématique)::
+    std::vector<int> message(corrected_codeword.end() - k, corrected_codeword.end());
+    spu::tools::Bit_packer::unpack(message.data(), out, k*m, 1, false, m);
 }

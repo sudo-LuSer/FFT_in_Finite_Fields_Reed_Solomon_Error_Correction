@@ -15,6 +15,7 @@ private:
     std :: vector<int> generator; 
     GaloisField *gf; 
     std::vector<int> mul_table; 
+    std::vector<std::vector<int>> slice_tables; 
 public: 
     RS_Encoder(int n, int k, GaloisField &gf);
     
