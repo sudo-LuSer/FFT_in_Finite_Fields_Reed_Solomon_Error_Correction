@@ -19,7 +19,12 @@ public:
     std::vector<int> forney(const std::vector<int>& lambda, const std::vector<int>& omega, const std::vector<int>& error_positions, const std::vector<int>& X);
     std::vector<int> decode(const std::vector<int>& received);
     std::vector<int> poly_mult(const std::vector<int>& a, const std::vector<int>& b);
-    int poly_eval(const std::vector<int>& poly, int x);
+    inline int poly_eval(const std::vector<int>& poly, int x) {
+        int result = 0;
+        for (int i = (int)poly.size() - 1; i >= 0; --i)
+            result = GF_ADD(gf.mul(result, x), poly[i]);
+        return result;
+    }
     std :: vector<int> formal_derivative(const std::vector<int>& poly);
 protected: 
     std :: vector <int> AlphaPow_reg;

@@ -57,7 +57,6 @@ std::vector<int> RS_Decoder::compute_syndromes(const std::vector<int>& received)
 
 void RS_Decoder::berlekamp_massey(const std::vector<int>& s, std::vector<int>& lambda_out) {
     const int N = 2*t;
-    // Use scratch vectors
     std::vector<int>& C = lambda_scratch;
     std::vector<int>& B = omega_scratch; 
     C.assign(N+1, 0);
@@ -110,7 +109,7 @@ std::vector<int> RS_Decoder::chien_search(const std::vector<int>& lambda,
             sum ^= reg[j];
         if (sum == 0) {
             error_positions.push_back(i);
-            X.push_back(alpha_inv[i]);  // X = alpha^(-i)
+            X.push_back(alpha_inv[i]); 
         }
         for (int j = 1; j <= L; ++j)
             reg[j] = gf.mul(alpha_inv[j], reg[j]);
@@ -140,7 +139,6 @@ std::vector<int> RS_Decoder::forney(const std::vector<int>& lambda,
     return error_values;
 }
 
-// Poly multiplication with early exit (small polynomials)
 std::vector<int> RS_Decoder::poly_mult(const std::vector<int>& a, const std::vector<int>& b) {
     std::vector<int> res(a.size() + b.size() - 1, 0);
     for (size_t i = 0; i < a.size(); ++i) {
@@ -155,15 +153,6 @@ std::vector<int> RS_Decoder::poly_mult(const std::vector<int>& a, const std::vec
     return res;
 }
 
-// Poly eval with Horner, uses gf.mul (could be inlined)
-int RS_Decoder::poly_eval(const std::vector<int>& poly, int x) {
-    int result = 0;
-    for (int i = (int)poly.size() - 1; i >= 0; --i)
-        result = GF_ADD(gf.mul(result, x), poly[i]);
-    return result;
-}
-
-// Main decode with reuse of scratch
 std::vector<int> RS_Decoder::decode(const std::vector<int>& received) {
     std::vector<int> syndromes = compute_syndromes(received);
     if (!error_flag) return received;
