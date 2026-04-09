@@ -1,0 +1,157 @@
+<html>
+<head>
+<title>
+A Tour of NTL: Using NTL with the gf2x library  </title>
+</head>
+
+
+<center>
+<a href="tour-gmp.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+ <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
+<a href="tour-time.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+</center>
+
+<h1> 
+<p align=center>
+A Tour of NTL: Using NTL with the GF2X library
+</p>
+</h1>
+
+<p> <hr> <p>
+
+GF2X is a library for fast multiplication 
+of polynomials over <i>GF(2)</i>.
+The GF2X library was developed by Emmanuel Thom&eacute;,
+Paul Zimmermmann, Pierrick Gaudry, and Richard Brent.
+
+<p>
+
+Unlike NTL, which only imlements a version of Karatsuba multiplication,
+GF2X implements other algorithms that are faster
+for very large degree polynomials.
+If you use NTL if the GF2X library,
+then multiplication, division, GCD, and minimum polynomal
+calculations for the <a href="GF2X.cpp.html">GF2X</a> class will 
+be faster for large degree polymials.
+
+<p>
+For example,
+based on benchmarks on an Intel Xeon Platinum 8175M (which is 
+the server configuration of the Skylake microarchitecture),
+compared to NTL's default implementation,
+the GF2X library is 1.4x faster at multiplying polynomials
+of degree 1,000 over <i>GF(2)</i>, 
+and 2.1x faster at multiplying polynomials of degree 1,000,000.
+
+
+<p>
+<p>
+<b>Note:</b> GF2X is thread safe, so you should feel free to use it
+in a thread-safe build of NTL.
+However, it is 
+<i>not</i> entirely exception friendly (it may
+abort a running program, but only in some very extreme and
+unusal circumstances).
+
+
+
+
+<p>
+<h2>
+Downloading and building GF2X
+</h2>
+<p>
+
+Download GF2X from <a href="https://gitlab.inria.fr/gf2x/gf2x">here.</a>
+This is a gitlab page that allows you to clone a git repository.
+If you do not want to use git, you
+you can also just download
+<tt>gf2x-XXX.tar.gz</tt> 
+(both options are accessible through the "code" tab on that page).
+<p>
+Assuming you have downloaded  <tt>gf2x-XXX.tar.gz</tt>, 
+do the following:
+<pre>
+   % tar -xf gf2x-XXX.tar
+   % cd gf2x-XXX
+   % autoreconf -i
+   % ./configure --prefix=$HOME/.local
+   % make
+   % make check
+   % make install
+</pre>
+Note the line "<tt>autoreconf -i</tt>". 
+This is needed because GF2X is distributed without a configure script.
+Rather, the configure script has to be built using <tt>autoreconf</tt>,
+which is a part of the GNU autotools suite.
+Depending on your system, you may have to install GNU autotools
+before you can build GF2X.
+<p>
+This will build, test, and install GF2X in <tt>$HOME/.local</tt>.
+Of course, change <tt>$HOME/.local</tt> to whatever you want.
+You will find the GF2X header files in <tt>$HOME/.local/include</tt> 
+and the compiled binaries in <tt>$HOME/.local/lib</tt>.
+
+<p>
+By default, this is will install both a static and shared library.
+You can supply the option
+<tt>--disable-shared</tt> to the <tt>configure</tt> script,
+if you only want static libraries.
+If you do this, you may also consider passing the <tt>--with-pic</tt>
+option if you want another shared library to be able to call functions
+in GF2X. 
+
+
+<p>
+
+When building NTL with GF2X, you have to tell NTL that you want to
+use it.
+To do this,
+pass the argument 
+<tt>NTL_GF2X_LIB=on</tt> to the NTL configure script
+when you are <a href="tour-unix.html">installing NTL</a>.
+
+
+<p>
+You need to make sure that the NTL configure script knows
+where to find GF2X when you are builing NTL.
+You can do this by passing <tt>GF2X_PREFIX=$HOME/.local</tt>
+or <tt>DEF_PREFIX=$HOME/.local</tt> to NTL's configure script.
+<p>
+For example, if NTL, GMP, and GF2X are all being installed
+in <tt>$HOME/.local</tt>, invoke NTL's configure script like this:
+<pre>
+   % ./configure DEF_PREFIX=$HOME/.local NTL_GF2X_LIB=on 
+</pre>
+
+<p>
+Also when you link and run a program that uses NTL,
+you have to make sure that the GF2X library is found 
+at link time and, depending on the system, possibly at run time.
+The best way to see how to do this is to look at the
+file <tt>USER_MAKEFILE.txt</tt> installed in NTL's include
+directory &mdash; again, see <a href="tour-unix.html">here</a>
+for details.
+
+<p>
+When using NTL with GF2X, 
+as a user of NTL, you do not need to
+know or understand anything about the the GF2X library.
+
+
+
+<p> <hr> <p>
+
+
+<p>
+
+<center>
+<a href="tour-gmp.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+ <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
+<a href="tour-time.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+</center>
+
+
+
+</body>
+</html>

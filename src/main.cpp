@@ -1,28 +1,57 @@
 #include <iostream>
-#include "RS_tools.hpp"
+#include <vector>
+#include <NTL/GF2E.h>
+#include <NTL/GF2X.h>
+#include "RS_Encoder_NTL.hpp"
+#include "RS_tools.hpp" 
 #include "RS_Encoder.hpp"
-#include "RS_Decoder.hpp"
+int main() {
+    std :: cout << std :: endl;
+    std :: cout << "----------------------------- Test RS NTT(7, 3) code -----------------------------";
+    std :: cout << std :: endl;
+    int m = 3;
+    int n = 7;
+    int k = 3;
 
-int main(){
-    // RS(7, 3) code
-    int n = 7; // codeword length       
-    int k = 3; // message length
-    int m = 3; // degree of the field GF(2^m) with m >= log2(n)
-    int t = (n - k) / 2; // error correction capability
+    // Initialise NTL field using the same primitive polynomial as GaloisField
+    uint32_t mask = poly_masks[m];
+    NTL::GF2X prim;
+    for (int i = 0; i <= m; ++i) {
+        if (mask & (1 << i)) {
+            NTL::SetCoeff(prim, i, 1);
+        }
+    }
+    NTL::GF2E::init(prim);
+
+    RS_Encoder_NTL encoder_ntt(n, k);
+
+    std::vector<int> message(k);
+    for (int i = 1; i <= k; ++i)
+        message[i-1] = i; // Example message: [1, 2, 3]
+
+    std::vector<int> codeword = encoder_ntt.encode(message);
+
+    std :: cout << "Code: ";
+    for (int c : codeword) {
+        std :: cout << c << " ";
+    }
+    std :: cout << std :: endl;
+    std :: cout << std :: endl;
+    std :: cout << "----------------------------- Test RS(7, 3) code -----------------------------";
+    std :: cout << std :: endl;
+    int t = (n - k) / 2; // Error correction capability
+    // RS(7, 3) code parameters
     std::cout << "RS(" << n << ", " << k << ") code with error correction capability t = " << t << std::endl;
     // Create encoder and decoder
     GaloisField GF(m); // Create Galois Field GF(2)
     RS_Encoder encoder(n, k, GF);
-    RS_Decoder decoder(n, k, GF);
     // Example message
-    std::vector<int> message = {3, 2, 1}; // Example message of length k
     std::cout << "Original message: ";
     for (int m : message) {
         std::cout << m << " ";
     }
     std::cout << std::endl;
     // Encode the message
-    std::vector<int> codeword;
     encoder.encode(message, codeword);
     std::cout << "Encoded codeword: ";
     for (int c : codeword) {
@@ -40,12 +69,5 @@ int main(){
         std::cout << r << " ";
     }
 
-    std::cout << std::endl;
-    // Decode the received codeword
-    std::vector<int> decoded_message = decoder.decode(received);
-
-    std::cout << "Decoded message: ";
-    for (int d : decoded_message) {
-        std::cout << d << " ";
-    }   
+    std::cout << std::endl; 
 }

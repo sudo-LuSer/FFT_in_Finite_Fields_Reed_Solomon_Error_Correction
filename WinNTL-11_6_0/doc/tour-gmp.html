@@ -1,0 +1,254 @@
+<html>
+<head>
+<title>
+A Tour of NTL: Using NTL with GMP  </title>
+</head>
+
+
+<center>
+<a href="tour-impl.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+ <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
+<a href="tour-gf2x.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+</center>
+
+<h1> 
+<p align=center>
+A Tour of NTL: Using NTL with GMP
+</p>
+</h1>
+
+<p> <hr> <p>
+
+GMP is the GNU Multi-Precision library.
+You can get more information about it, as well as the latest version
+from <a href="http://gmplib.org">here.</a>
+
+<p>
+
+Briefly, GMP is a library for long integer arithmetic.
+It has hand-crafted assembly routines for a wide variety
+of architectures.
+For basic operations, like integer multiplication, it can be 
+several times faster than NTL's
+traditional long integer package.
+
+<p>
+As of version 9.6.3, NTL uses GMP by default.
+You can disable GMP by passing <tt>NTL_GMP_LIP=off</tt>
+as an option to NTL's <tt>configure</tt> script.
+If you disable the use of GMP,
+NTL uses a long integer package derived
+from Arjen Lenstra's LIP package.
+This is not recommended: GMP is much faster.
+
+<p>
+Even if you do not use GMP,
+you should still read the <a href="#compat">section below
+on backward compatabilty</a>
+so that you can write portable code and avoid deprecated constructs.
+
+<p>
+<b>Note:</b> GMP is thread safe, so you should feel free to use it
+in a thread-safe build of NTL.
+However, it is
+is <i>not</i> entirely exception friendly (it may
+abort a running program, but only in some very extreme and
+unusal circumstances).
+
+
+
+<p>
+<h2>
+Downloading and building GMP
+</h2>
+<p>
+
+Many unix distributions now include GMP by default.
+However, even if it is included, it is recommended to
+build it from source.
+The reason is that the system-installed GMP is typically
+not well optimized, as it often targets a generic instruction set,
+rather than the instruction set on your actual machine.
+It is actually very easy to build and install GMP from source.
+<p>
+
+Download GMP from <a href="http://gmplib.org">here.</a>
+You will get a file <tt>gmp-XXX.tar.xz</tt>.
+<p>
+Now do the following:
+<pre>
+   % tar -xf gmp-XXX.tar.xz
+   % cd gmp-XXX
+   % ./configure --prefix=$HOME/.local
+   % make
+   % make check
+   % make install
+</pre>
+This will build, test, and install GMP in <tt>$HOME/.local</tt>.
+Of course, change <tt>$HOME/.local</tt> to whatever you want.
+You will find the GMP header files in <tt>$HOME/.local/include</tt> 
+and the compiled binaries in <tt>$HOME/.local/lib</tt>.
+
+<p>
+By default, this is will install both a static and shared library.
+You can supply the option
+<tt>--disable-shared</tt> to the <tt>configure</tt> script,
+if you only want static libraries.
+If you do this, you may also consider passing the <tt>--with-pic</tt>
+option if you want another shared library to be able to call functions
+in GMP. 
+
+<p>
+You need to make sure that the NTL configure script knows
+where to find GMP when you are builing NTL.
+As discussed discussed in <a href="tour-unix.html">here</a>,
+you can do this by passing <tt>GMP_PREFIX=$HOME/.local</tt>
+or <tt>DEF_PREFIX=$HOME/.local</tt> to NTL's configure script.
+<p>
+Also when you link and run a program that uses NTL,
+you have to make sure that the GMP library is found 
+at link time and, depending on the system, possibly at run time.
+The best way to see how to do this is to look at the
+file <tt>USER_MAKEFILE.txt</tt> installed in NTL's include
+directory &mdash; again, see <a href="tour-unix.html">here</a>
+for details.
+
+
+
+<p>
+When using NTL with GMP, 
+as a user of NTL, you do not need to
+know or understand anything about the the GMP library.
+So while there is detailed documentation available about how
+to use GMP, you do not have to read it.
+The programming interface to the long integer package 
+completely hides implementation details.
+
+
+
+
+<p>
+<h2>
+<a name="compat">
+Backward compatbility
+</a>
+</h2>
+<p>
+
+This section is only relevant for very old programs that use NTL.
+<p>
+
+With version 5.0 of NTL, some aspects of the programming interface
+were 'deprecated' so as to allow the use of another long integer package,
+such as GMP, as the long integer package.
+
+<p>
+Prior to version 5.0, the macro <tt>NTL_NBITS</tt> was defined,
+along with the macro <tt>NTL_RADIX</tt> defined to be 
+<tt>(1L &lt;&lt; NTL_NBITS)</tt>.
+While these macros are still available when using NTL's traditional
+long integer package (i.e., when <tt>NTL_GMP_LIP</tt> is not set),
+they are not available when using the GMP as the long integer
+package (i.e., when <tt>NTL_GMP_LIP</tt> is set).
+Furthermore, when writing portable programs, one should avoid these macros.
+
+<p>
+
+
+Also, the static function <tt>long ZZ::digit(const ZZ &amp;, long);</tt>
+is defined when using traditional long integer arithmetic,
+but is not available when using GMP as the long integer package,
+and in any case, its use should be avoided when writing portable programs. 
+
+
+<p>
+Instead of the above macros, one should use the followng macros:
+
+<pre>
+   NTL_ZZ_NBITS -- number of bits in a limb;
+                   a ZZ is represented as a sequence of limbs.
+
+   NTL_SP_NBITS -- max number of bits in a "single-precision" number
+
+   NTL_WSP_NBITS -- max number of bits in a "wide single-precision" number
+</pre>
+<p>
+The following relations hold:
+<pre>
+   NTL_SP_NBITS &lt;= NTL_WSP_NBITS &lt;= NTL_ZZ_NBITS
+   26 &lt;= NTL_SP_NBITS &lt;= min(NTL_BITS_PER_LONG-2, NTL_DOUBLE_PRECISION-3)
+   NTL_WSP_NBITS &lt;= NTL_BITS_PER_LONG-2
+</pre>
+
+<p>
+
+Note that <tt>NTL_ZZ_NBITS</tt> may be less than, equal to, or greater than
+<tt>NTL_BITS_PER_LONG</tt>  -- no particular relationship 
+should be assumed to hold.
+In particular, expressions like <tt>(1L &lt;&lt; NTL_ZZ_BITS)</tt>
+might overflow.
+
+<p>
+"single-precision" numbers are meant to be used in conjunction with the
+single-precision modular arithmetic routines.
+
+<p>
+"wide single-precision" numbers are meant to be used in conjunction
+with the <tt>ZZ</tt> arithmetic routines for optimal efficiency.
+
+<p>
+Note that when using traditional long integer arithmetic, we have
+<pre>
+    NTL_ZZ_NBITS = NTL_SP_NBITS = NTL_WSP_NBITS = NTL_NBITS.
+</pre>
+
+<p>
+The following auxilliary macros are also defined:
+
+<pre>
+NTL_FRADIX -- double-precision value of <tt>2^NTL_ZZ_NBITS</tt>
+NTL_SP_BOUND -- (1L &lt;&lt; NTL_SP_NBITS)
+NTL_WSP_BOUND -- (1L &lt;&lt; NTL_WSP_NBITS)
+</pre>
+
+<p>
+
+Note that for a <tt>ZZ</tt> <tt>n</tt>,
+<tt>n.size()</tt> returns the number of "limbs" of <tt>n</tt>.
+This is supported with either traditional or GMP integer arithemtic.
+Note, however, that some old codes might write <tt>n.size() &lt;= 1</tt>
+as a way to test if <tt>NumBits(n) &lt;= NTL_NBITS</tt>.
+This is no longer the right thing to do, if one wants portable code
+that works with either traditional or GMP long integer arithmetic.
+First, one has to decide whether one wants to test if
+<tt>NumBits(n)</tt> is bounded by <tt>NTL_ZZ_NBITS</tt>, 
+<tt>NTL_SP_NBITS</tt>, or <tt>NTL_WSP_NBITS</tt>.
+In the first case, <tt>n.size() &lt;= 1</tt> is still 
+the right way to test this.
+In the second case, write this as <tt>n.SinglePrecision()</tt>.
+In the third case, write this as <tt>n.WideSinglePrecision()</tt>.
+The routines <tt>SinglePrecision</tt> and <tt>WideSinglePrecision</tt>
+are new to NTL version 5.0.
+
+<p>
+
+Most "high level" applications that use NTL should not be affected
+by these changes to NTL's programming interface, and if they are,
+changing the programs should be quite easy.
+
+
+<p> <hr> <p>
+
+
+<p>
+
+<center>
+<a href="tour-impl.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+ <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
+<a href="tour-gf2x.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+</center>
+
+
+
+</body>
+</html>

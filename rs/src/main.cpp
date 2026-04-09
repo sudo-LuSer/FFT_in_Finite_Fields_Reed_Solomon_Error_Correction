@@ -11,6 +11,7 @@
 
 #include "custom/Encoder_RS.hpp"
 #include "custom/Decoder_RS.hpp"
+#include "custom/NTL_ENCODER_RS.hpp"
 
 using namespace spu;
 using namespace spu::module;
@@ -57,6 +58,8 @@ int main(int argc, char** argv)
     module::Encoder_RS         encoder_rs(N_rs, K_rs, m);
     module::Decoder_RS         decoder_rs(N_rs, K_rs, m);
 
+    module::NTL_ENCODER_RS         encoder_ntl_rs(N_rs, K_rs, m);
+
     // 2. Sockets binding
     using namespace aff3ct::module;
     using namespace aff3ct::tools;
@@ -64,18 +67,18 @@ int main(int argc, char** argv)
     // Chain construction
     
     // Chain: Source -> (Custom Module) -> Encoder
-    source   [src::tsk::generate][(int)src::sck::generate::out_data] =  encoder_rs ["process::in"];
-    encoder_rs ["process::out"] = cmp["compare :: input1"]; //finalizer["finalize::in"]; //  encoder  [enc::tsk::encode][(int)enc::sck::encode::U_K];
+    source   [src::tsk::generate][(int)src::sck::generate::out_data] =  encoder_ntl_rs ["process::in"];
+    encoder_ntl_rs ["process::out"] = cmp["compare :: input1"]; //finalizer["finalize::in"]; //  encoder  [enc::tsk::encode][(int)enc::sck::encode::U_K];
     source   [src::tsk::generate][(int)src::sck::generate::out_data] = encoder  [enc::tsk::encode][(int)enc::sck::encode::U_K];
     encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = cmp["compare::input2"];  
     cmp["compare :: output"] = finalizer["finalize::in"];
 
-    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::Y_N];
-    decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::V_K] = cmp_["compare :: input1"]; 
-    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder_rs ["process::in"];
-    // encoder_rs ["process :: out"] = decoder_rs["process :: in"];
-    decoder_rs["process :: out"] = cmp_["compare :: input2"];
-    cmp_["compare::output"] = finalizer_["finalize::in"];
+    // encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::Y_N];
+    // decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::V_K] = cmp_["compare :: input1"]; 
+    // encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = decoder_rs ["process::in"];
+    // // encoder_rs ["process :: out"] = decoder_rs["process :: in"];
+    // decoder_rs["process :: out"] = cmp_["compare :: input2"];
+    // cmp_["compare::output"] = finalizer_["finalize::in"];
 
     // 3. Sequence creation
     std::vector<runtime::Task*> first_tasks;

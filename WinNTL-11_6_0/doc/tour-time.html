@@ -1,0 +1,118 @@
+<html>
+<head>
+<title>
+A Tour of NTL: Some Performance Data  </title>
+</head>
+
+
+<center>
+<a href="tour-gf2x.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+ <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
+<a href="tour-roadmap.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+</center>
+
+<h1> 
+<p align=center>
+A Tour of NTL: Some Performance Data 
+</p>
+</h1>
+
+<p> <hr> <p>
+
+Here are some timing figures from using NTL.
+They were obtained using NTL 11.6.0 compiled with
+Apple clang version 17.0.0 (clang-1700.3.19.1)
+and with GMP 6.3 on an Apple M1 Max running macOS.
+
+<p>
+All times are ins <i>seconds</i>.
+The times were obtained using the program <tt>Timing</tt>
+included in the distribution.
+The data was generated using NTL's random number generator,
+but running this on a different machine should (in theory)
+generate the same data.
+
+<p>
+<pre>
+
+multiply 1000-bit ints: 1.2862e-07
+square 1000-bit ints: 7.99998e-08
+remainder 2000/1000-bit ints: 3.0913e-07
+gcd 1000-bit ints: 3.44037e-06
+xgcd 1000-bit ints: 4.18556e-06
+power mod 1000-bit ints: 0.000251588
+multiply degree-1000 poly mod 1000-bit prime: 0.00241779
+remainder degree-2000/1000 poly mod 1000-bit prime: 0.00662264
+preconditioned remainder degree-2000/1000 poly mod 1000-bit prime: 0.00243341
+gcd degree-1000 poly mod 1000-bit prime: 0.0706218
+multiply degree-1000 int poly with 1000-bit coeffs: 0.00293567
+
+factoring degree-1000 poly mod 1000-bit prime...
+square-free decomposition...0.071287
+factoring multiplicity 1, deg = 1000
+computing X^p...4.07509
+computing DDF...generating baby steps...+++++++++++++++++++++1.47373
+generating giant steps...++++++++++++++++++++++1.53734
+giant refine...++++split 1 18
+*++++*++++*++++*++++split 17 355
+*split 0 627
+giant refine time: 2.45511
+baby refine...split 1 1
+split 8 8
+split 9 9
+split 355 355
+split 627 627
+baby refine time: 0.02605
+DDF time: 5.49543
+...total time = 9.64638
+
+multiply 1000x1000 matrices mod 1000-bit prime: 6.01712
+
+multiply 500-bit GF2Xs: 1.82301e-08
+remainder 1000/500-bit GF2Xs: 4.12932e-07
+gcd 500-bit GF2Xs: 2.95696e-06
+
+factoring degree-500 GF2X: 8.74958e-05
+gcd 500-bit GF2X: 2.9557e-06
+multiply degree-500 poly mod 500-bit GF2X: 0.000861831
+remainder degree-1000/500 poly mod 500-bit GF2X: 0.0030675
+preconditioned remainder degree-1000/500 poly mod 500-bit GF2X: 0.00169757
+gcd degree-500 poly mod 500-bit GF2X: 0.019063
+
+factoring degree-500 poly mod 500-bit GF2X...
+square-free decomposition...0.00218
+factoring multiplicity 1, deg = 250
+computing X^p...0.170542
+computing DDF...generating baby steps...++++++++++0.120979
+generating giant steps...+++++++++++0.135235
+giant refine...++++split 1 9
+split 2 13
+split 4 44
+*++++split 7 73
+*split 0 111
+giant refine time: 0.084774
+baby refine...split 9 9
+split 13 13
+split 44 44
+split 73 73
+split 111 111
+baby refine time: 0.000523
+DDF time: 0.341556
+
+...total time = 0.507704
+
+</pre>
+
+
+<p>
+
+
+<center>
+<a href="tour-gf2x.html"><img src="arrow1.gif" alt="[Previous]" align=bottom></a>
+ <a href="tour.html"><img src="arrow2.gif" alt="[Up]" align=bottom></a> 
+<a href="tour-roadmap.html"> <img src="arrow3.gif" alt="[Next]" align=bottom></a>
+</center>
+
+
+</body>
+</html>

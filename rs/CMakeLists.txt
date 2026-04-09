@@ -10,8 +10,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(STREAMPU_ROOT "/mnt/c/Users/Nasr-allah/Desktop/hulotte/streampu" CACHE PATH "Path to StreamPU")
 
-
-
 set(AFF3CT_ROOT "/mnt/c/Users/Nasr-allah/Desktop/hulotte/aff3ct" CACHE PATH "Path to AFF3CT")
 
 
@@ -30,6 +28,7 @@ set(AFF3CT_INCLUDE_DIRS
     ${AFF3CT_ROOT}/lib/cli/src
     ${AFF3CT_ROOT}/lib/date/include/date
 )
+
 include_directories(${AFF3CT_INCLUDE_DIRS})
 
 # Find AFF3CT library
@@ -109,5 +108,5 @@ endif()
 
 # Main executable
 add_executable(rs src/main.cpp)
-target_link_libraries(rs ${HULOTTE_LIBS} ${CUSTOM_MODULE_LIBS})
+target_link_libraries(rs ${HULOTTE_LIBS} ${CUSTOM_MODULE_LIBS} ntl gmp)
 
