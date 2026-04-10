@@ -5,6 +5,7 @@
 #include "RS_Encoder_NTL.hpp"
 #include "RS_tools.hpp" 
 #include "RS_Encoder.hpp"
+#include "RS_DECODER_NTL.hpp"
 int main() {
     std :: cout << std :: endl;
     std :: cout << "----------------------------- Test RS NTT(7, 3) code -----------------------------";
@@ -36,6 +37,22 @@ int main() {
         std :: cout << c << " ";
     }
     std :: cout << std :: endl;
+    std :: vector<int> received = codeword;
+    received[1] = 0; // Introduce an error
+    RS_Decoder_NTL decoder_ntt(n, k);
+    std :: cout << "Received codeword with error: ";
+    for (int r : received) {
+        std :: cout << r << " ";
+    }   
+    std :: vector <int> decoded_message =
+    decoder_ntt.decode(received);
+    
+    std :: cout << "Decoded message: ";
+    for (int m : decoded_message) {
+        std :: cout << m << " ";
+    }
+
+    std :: cout << std :: endl;
     std :: cout << std :: endl;
     std :: cout << "----------------------------- Test RS(7, 3) code -----------------------------";
     std :: cout << std :: endl;
@@ -59,7 +76,7 @@ int main() {
     }
     std::cout << std::endl;
     // Introduce errors in the codeword
-    std::vector<int> received = codeword;
+    received = codeword;
     received[1] = 0; // Introduce an error
     if (t > 1) {
         received[2] = 0; // Introduce another error if t > 1

@@ -31,7 +31,6 @@ Encoder_RS::Encoder_RS(const int n, const int k, const int m)
         return runtime::status_t::SUCCESS;
     });
     messages.resize(k,0); 
-    CodeWord.resize(n,0); 
 }
 
 Encoder_RS* Encoder_RS::clone() const

@@ -1,3 +1,5 @@
 /rs/build
+/rs/src/custom/MyModule.cpp
+/rs/src/custom/MyModule.hpp
 /build/
 /ntl/
