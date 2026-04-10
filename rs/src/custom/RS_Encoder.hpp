@@ -12,9 +12,9 @@ private:
     int n;              
     int k;          
     int t;             
-    std :: vector<int> generator; 
+    std :: vector<int> generator;
     GaloisField *gf; 
-    
+
     std :: vector<int> mul_table; 
 public: 
     RS_Encoder(int n, int k, GaloisField &gf);

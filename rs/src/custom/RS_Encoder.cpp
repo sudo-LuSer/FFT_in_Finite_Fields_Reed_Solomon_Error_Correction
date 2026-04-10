@@ -1,19 +1,18 @@
 #include "RS_Encoder.hpp"
 #include "RS_tools.hpp"
-
+#include <assert.h>
 RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf) {
     if (n <= k) throw std::invalid_argument("n must be greater than k");
     t = (n - k) / 2;
-    
-    generator.push_back(1);
+
     int r = n - k;
+    generator.resize(r + 1);
+    generator[0] = gf.get_alpha_to()[r*(r+1)/2 % (gf.get_size() - 1)];
     for (int i = 1; i <= r; ++i) {
         int alpha_i = gf.get_alpha_to()[i];
-        generator.resize(generator.size() + 1, 0);
         for (int j = generator.size() - 1; j > 0; --j) {
             generator[j] = GF_ADD(generator[j-1], gf.mul(generator[j], alpha_i));
         }
-        generator[0] = gf.mul(generator[0], alpha_i);
     }
 
     int sz = gf.get_size();
