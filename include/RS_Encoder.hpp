@@ -1,32 +1,22 @@
 #pragma once
+#ifndef RS_ENCODER_H
+#define RS_ENCODER_H
 
-#ifndef RS_ENCODER_HPP
-#define RS_ENCODER_HPP
-#define RS_ENCODER_HPP
 #include <vector>
+#include "RS_tools.hpp"
 
-class GaloisField;
-
-class RS_Encoder {
+class RS_Encoder : public GaloisField {
 private:
-    int n;              
-    int k;          
-    int t;             
-    std :: vector<int> generator; 
-    GaloisField *gf; 
-    std::vector<int> mul_table; 
-    std::vector<std::vector<int>> slice_tables; 
-public: 
-    RS_Encoder(int n, int k, GaloisField &gf);
-    
-    const std :: vector<int>& get_generator() const { return generator; }
-    int get_degree() const { return generator.empty() ? 0 : (int)generator.size() - 1; }
-    
-    std :: vector<int> poly_mult_by_binomial(const std :: vector<int>& poly, int a);
+    int n, k, r, t;
 
-    void encode(const std::vector<int>& message, std :: vector <int> &codeword);
+    std::vector<int> generator;
+    std::vector<int> parity;
+    std::vector<int> mul_table;
+public:
+    RS_Encoder(int n, int k, const GaloisField& gf);
 
-    // std :: vector<int> poly_div(const std :: vector<int>& dividend, const std :: vector<int>& divisor);
+    void encode(const std::vector<int>& message,
+                std::vector<int>& codeword);
 };
 
 #endif

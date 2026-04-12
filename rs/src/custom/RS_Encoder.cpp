@@ -1,48 +1,97 @@
 #include "RS_Encoder.hpp"
-#include "RS_tools.hpp"
-#include <assert.h>
-RS_Encoder::RS_Encoder(int n, int k, GaloisField &gf) : n(n), k(k), gf(&gf) {
+#include <cstring>
+
+#include "mipp.h"
+RS_Encoder::RS_Encoder(int n, int k, const GaloisField &gf)
+    : n(n), k(k), GaloisField(gf)
+{
     if (n <= k) throw std::invalid_argument("n must be greater than k");
-    t = (n - k) / 2;
 
-    int r = n - k;
-    generator.resize(r + 1);
-    generator[0] = gf.get_alpha_to()[r*(r+1)/2 % (gf.get_size() - 1)];
+    r = n - k;
+    int sz = size;
+
+    t = r / 2;
+
+    generator.resize(r + 1, 0);
+    generator[0] = 1;
+
     for (int i = 1; i <= r; ++i) {
-        int alpha_i = gf.get_alpha_to()[i];
-        for (int j = generator.size() - 1; j > 0; --j) {
-            generator[j] = GF_ADD(generator[j-1], gf.mul(generator[j], alpha_i));
+        int alpha_i = alpha_to[i];
+
+        for (int j = i; j > 0; --j) {
+            generator[j] = GF_ADD(generator[j],
+                mul(generator[j - 1], alpha_i));
+        }
+
+        generator[0] = mul(generator[0], alpha_i);
+    }
+
+    mul_table.resize(size * r);
+
+    int* mt = mul_table.data();
+
+    for (int x = 0; x < size; ++x) {
+        for (int j = 0; j < r; ++j) {
+            mt[x * r + j] = mul(x, generator[j]);
         }
     }
 
-    int sz = gf.get_size();
-    mul_table.resize(r * sz);
-    int *mt = mul_table.data();
-    for (int j = 0; j < r; ++j) {
-        int gen_j = generator[j];
-        for (int x = 0; x < sz; ++x) {
-            mt[j * sz + x] = gf.mul(x, gen_j);
-        }
-    }
-
+    parity.resize(r, 0);
 }
 
 void RS_Encoder::encode(const std::vector<int>& message, std::vector<int>& codeword) {
     const int r = n - k;
-    const int sz = gf->get_size();
-    const int *mt = mul_table.data();
-    std::vector<int> parity(r, 0);
-    int *par = parity.data();
+    int* __restrict par = parity.data();
+    const int* __restrict mt = mul_table.data();
+    const int* __restrict msg = message.data();
     
     for (int i = k - 1; i >= 0; --i) {
-        int feedback = GF_ADD(message[i], par[r-1]);
+        int feedback = GF_ADD(msg[i], par[r-1]);
         for (int j = r - 1; j > 0; --j) {
-            par[j] = GF_ADD(par[j-1], mt[j * sz + feedback]);
+            par[j] = GF_ADD(par[j-1], mt[feedback * r + j]);
         }
-        par[0] = mt[feedback]; 
+        par[0] = mt[feedback * r];
     }
     
     codeword.resize(n);
-    std::copy(par, par + r, codeword.begin());
-    std::copy(message.begin(), message.end(), codeword.begin() + r);
+    std::memcpy(codeword.data(), par, r * sizeof(int));
+    std::memcpy(codeword.data() + r, msg, k * sizeof(int));
+    // std::copy(par, par + r, codeword.begin());
+    // std::copy(message.begin(), message.end(), codeword.begin() + r);
 }
+
+// void RS_Encoder::encode(const std::vector<int>& message,
+//                         std::vector<int>& codeword)
+// {
+//     constexpr int N = mipp::N<int>();
+//     int* __restrict par = parity.data();
+//     const int* __restrict mt = mul_table.data();
+//     const int* __restrict msg = message.data();
+
+//     for (int i = 0; i < k; ++i) {
+//         int feedback = msg[i] ^ par[0];
+
+//         for (int j = 0; j < r - 1; ++j)
+//             par[j] = par[j + 1];
+//         par[r - 1] = 0;
+
+//         if (feedback) {
+//             const int* row = mt + feedback * r;
+//             int j = 0;
+//             for (int vec_end = (r / N) * N; j < vec_end; j += N) {
+//                 mipp::Reg<int> p(&par[j]);
+//                 mipp::Reg<int> rw(&row[j]);
+//                 p ^= rw;
+//                 p.store(&par[j]);
+//             }
+//             for (; j < r; ++j)
+//                 par[j] ^= row[j];
+//         }
+//     }
+
+//     codeword.resize(n);
+//     // std::copy(par, par + r, codeword.begin());
+//     // std::copy(message.begin(), message.end(), codeword.begin() + r);
+//     std::memcpy(codeword.data(), par, r * sizeof(int));
+//     std::memcpy(codeword.data() + r, msg, k * sizeof(int));
+// }

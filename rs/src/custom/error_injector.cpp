@@ -40,7 +40,7 @@ void error_injector::_process(const int* in, int* out, const int frame_id)
     int t = n_elmts; 
     int i = 0;
     while(t--){
-        p[i] = p[i] ^ 0xFF; // Inject error by flipping bits (for demonstration)
+        p[i] = !p[i]; // Inject error by flipping bits (for demonstration)
         i ++; 
     }
     // Minimal example: copy input to output and print trace

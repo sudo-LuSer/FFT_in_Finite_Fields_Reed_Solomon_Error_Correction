@@ -55,8 +55,8 @@ int main(int argc, char** argv)
     aff3ct::module::Encoder_RS<>     encoder(K_rs, N_rs, poly);
     aff3ct::module::Decoder_RS_std<> decoder(K_rs, N_rs, poly);    
 
-    module :: error_injector error_inj(N_rs,K_rs,m,2); // Inject up to t-1 errors
-
+    module :: error_injector error_inj1(N_rs,K_rs,m,8); // Inject up to t-1 errors
+    module :: error_injector error_inj2(N_rs,K_rs,m,8); // Inject up to t-1 errors
     module::Encoder_RS         encoder_rs(N_rs, K_rs, m);
     module::Decoder_RS         decoder_rs(N_rs, K_rs, m);
 
@@ -75,10 +75,11 @@ int main(int argc, char** argv)
     encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = cmp["compare::input2"];  
     cmp["compare :: output"] = finalizer["finalize::in"];
 
-    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = error_inj ["process::in"]; 
-    error_inj ["process::out"] = decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::Y_N];
+    encoder  [enc::tsk::encode][(int)enc::sck::encode::X_N] = error_inj1 ["process::in"]; 
+    error_inj1 ["process::out"] = decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::Y_N];
+    encoder_rs ["process :: out"] = error_inj2 ["process::in"];
+    error_inj2 ["process::out"] = decoder_rs ["process::in"];
     decoder  [dec::tsk::decode_hiho][(int)dec::sck::decode_hiho::V_K] = cmp_["compare :: input1"]; 
-    error_inj["process::out"] = decoder_rs ["process::in"];
     // encoder_rs ["process :: out"] = decoder_rs["process :: in"];
     decoder_rs["process :: out"] = cmp_["compare :: input2"];
     cmp_["compare::output"] = finalizer_["finalize::in"];
@@ -107,7 +108,7 @@ int main(int argc, char** argv)
     sequence.export_dot(file);
 
     // Run the sequence
-    for (auto i = 0; i < 100; i++)
+    for (auto i = 0; i < 1000; i++)
         sequence.exec_seq(); // Run 1 frame at a time
 
     // 5. Stats

@@ -1,28 +1,22 @@
 #pragma once
+#ifndef RS_ENCODER_H
+#define RS_ENCODER_H
 
-#ifndef RS_ENCODER_HPP
-#define RS_ENCODER_HPP
-#define RS_ENCODER_HPP
 #include <vector>
+#include "RS_tools.hpp"
 
-class GaloisField;
-
-class RS_Encoder {
+class RS_Encoder : public GaloisField {
 private:
-    int n;              
-    int k;          
-    int t;             
-    std :: vector<int> generator;
-    GaloisField *gf; 
+    int n, k, r, t;
 
-    std :: vector<int> mul_table; 
-public: 
-    RS_Encoder(int n, int k, GaloisField &gf);
-    
-    const std :: vector<int>& get_generator() const { return generator; }
-    int get_degree() const { return generator.empty() ? 0 : (int)generator.size() - 1; }
+    std::vector<int> generator;
+    std::vector<int> parity;
+    std::vector<int> mul_table;
+public:
+    RS_Encoder(int n, int k, const GaloisField& gf);
 
-    void encode(const std::vector<int>& message, std :: vector <int> &codeword);
+    void encode(const std::vector<int>& message,
+                std::vector<int>& codeword);
 };
 
 #endif
