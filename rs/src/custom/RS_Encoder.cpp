@@ -19,8 +19,7 @@ RS_Encoder::RS_Encoder(int n, int k, const GaloisField &gf)
         int alpha_i = alpha_to[i];
 
         for (int j = i; j > 0; --j) {
-            generator[j] = GF_ADD(generator[j],
-                mul(generator[j - 1], alpha_i));
+            generator[j] = GF_ADD(generator[j - 1], mul(generator[j], alpha_i));
         }
 
         generator[0] = mul(generator[0], alpha_i);
@@ -40,7 +39,8 @@ RS_Encoder::RS_Encoder(int n, int k, const GaloisField &gf)
 }
 
 void RS_Encoder::encode(const std::vector<int>& message, std::vector<int>& codeword) {
-    const int r = n - k;
+    std::fill(parity.begin(), parity.end(), 0); 
+
     int* __restrict par = parity.data();
     const int* __restrict mt = mul_table.data();
     const int* __restrict msg = message.data();
@@ -56,8 +56,6 @@ void RS_Encoder::encode(const std::vector<int>& message, std::vector<int>& codew
     codeword.resize(n);
     std::memcpy(codeword.data(), par, r * sizeof(int));
     std::memcpy(codeword.data() + r, msg, k * sizeof(int));
-    // std::copy(par, par + r, codeword.begin());
-    // std::copy(message.begin(), message.end(), codeword.begin() + r);
 }
 
 // void RS_Encoder::encode(const std::vector<int>& message,

@@ -5,7 +5,8 @@
 #include "RS_Encoder_NTL.hpp"
 #include "RS_tools.hpp" 
 #include "RS_Encoder.hpp"
-#include "RS_DECODER_NTL.hpp"
+#include "RS_Decoder.hpp"
+// #include "RS_DECODER_NTL.hpp"
 int main() {
     std :: cout << std :: endl;
     std :: cout << "----------------------------- Test RS NTT(7, 3) code -----------------------------";
@@ -13,45 +14,9 @@ int main() {
     int m = 3;
     int n = 7;
     int k = 3;
-
-    // Initialise NTL field using the same primitive polynomial as GaloisField
-    uint32_t mask = poly_masks[m];
-    NTL::GF2X prim;
-    for (int i = 0; i <= m; ++i) {
-        if (mask & (1 << i)) {
-            NTL::SetCoeff(prim, i, 1);
-        }
-    }
-    NTL::GF2E::init(prim);
-
-    RS_Encoder_NTL encoder_ntt(n, k);
-
-    std::vector<int> message(k);
-    for (int i = 1; i <= k; ++i)
-        message[i-1] = i; // Example message: [1, 2, 3]
-
-    std::vector<int> codeword = encoder_ntt.encode(message);
-
-    std :: cout << "Code: ";
-    for (int c : codeword) {
-        std :: cout << c << " ";
-    }
-    std :: cout << std :: endl;
-    std :: vector<int> received = codeword;
-    received[1] = 0; // Introduce an error
-    RS_Decoder_NTL decoder_ntt(n, k);
-    std :: cout << "Received codeword with error: ";
-    for (int r : received) {
-        std :: cout << r << " ";
-    }   
-    std :: vector <int> decoded_message =
-    decoder_ntt.decode(received);
-    
-    std :: cout << "Decoded message: ";
-    for (int m : decoded_message) {
-        std :: cout << m << " ";
-    }
-
+    std::vector<int> message = {3 , 2 , 1}; // Example message of length k
+    std::vector<int> codeword(n); // To hold the encoded codeword
+    std::vector<int> received(n); // To hold the received codeword with errors
     std :: cout << std :: endl;
     std :: cout << std :: endl;
     std :: cout << "----------------------------- Test RS(7, 3) code -----------------------------";
@@ -85,6 +50,15 @@ int main() {
     for (int r : received) {
         std::cout << r << " ";
     }
+
+    RS_Decoder decoder(n, k, GF);
+    std::vector<int> decoded_message(k); // To hold the decoded message
+    decoded_message = decoder.decode(received);
+    std::cout << "Decoded message: ";
+    for (int d : decoded_message) {
+        std::cout << d << " ";
+    }
+
 
     std::cout << std::endl; 
 }

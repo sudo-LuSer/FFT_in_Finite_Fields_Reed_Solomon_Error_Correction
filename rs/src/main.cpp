@@ -55,8 +55,8 @@ int main(int argc, char** argv)
     aff3ct::module::Encoder_RS<>     encoder(K_rs, N_rs, poly);
     aff3ct::module::Decoder_RS_std<> decoder(K_rs, N_rs, poly);    
 
-    module :: error_injector error_inj1(N_rs,K_rs,m,8); // Inject up to t-1 errors
-    module :: error_injector error_inj2(N_rs,K_rs,m,8); // Inject up to t-1 errors
+    module :: error_injector error_inj1(N_rs,K_rs,m,2); // Inject up to t-1 errors
+    module :: error_injector error_inj2(N_rs,K_rs,m,2); // Inject up to t-1 errors
     module::Encoder_RS         encoder_rs(N_rs, K_rs, m);
     module::Decoder_RS         decoder_rs(N_rs, K_rs, m);
 
