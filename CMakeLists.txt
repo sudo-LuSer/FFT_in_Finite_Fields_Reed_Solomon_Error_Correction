@@ -13,7 +13,7 @@ add_executable(RS_RUN
     src/RS_Decoder.cpp 
     src/RS_tools.cpp
     src/RS_ENCODER_NTL.cpp
-    #src/RS_DECODER_NTL.cpp
+    src/berlekamp.cpp
 )
 
 target_link_libraries(RS_RUN 
