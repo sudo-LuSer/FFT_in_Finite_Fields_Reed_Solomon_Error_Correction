@@ -1,64 +1,54 @@
 #include <iostream>
 #include <vector>
-#include <NTL/GF2E.h>
-#include <NTL/GF2X.h>
-#include "RS_Encoder_NTL.hpp"
-#include "RS_tools.hpp" 
+#include "RS_tools.hpp"
 #include "RS_Encoder.hpp"
 #include "RS_Decoder.hpp"
-// #include "RS_DECODER_NTL.hpp"
+
 int main() {
-    std :: cout << std :: endl;
-    std :: cout << "----------------------------- Test RS NTT(7, 3) code -----------------------------";
-    std :: cout << std :: endl;
-    int m = 3;
-    int n = 7;
-    int k = 3;
-    std::vector<int> message = {3 , 2 , 1}; // Example message of length k
-    std::vector<int> codeword(n); // To hold the encoded codeword
-    std::vector<int> received(n); // To hold the received codeword with errors
-    std :: cout << std :: endl;
-    std :: cout << std :: endl;
-    std :: cout << "----------------------------- Test RS(7, 3) code -----------------------------";
-    std :: cout << std :: endl;
-    int t = (n - k) / 2; // Error correction capability
-    // RS(7, 3) code parameters
-    std::cout << "RS(" << n << ", " << k << ") code with error correction capability t = " << t << std::endl;
-    // Create encoder and decoder
-    GaloisField GF(m); // Create Galois Field GF(2)
-    RS_Encoder encoder(n, k, GF);
-    // Example message
-    std::cout << "Original message: ";
-    for (int m : message) {
-        std::cout << m << " ";
+    int m = 8;
+    int n = 255;
+    int k = 239;
+    int t = (n - k) / 2;
+
+    std::cout << "RS(" << n << ", " << k << ") code, t = " << t << std::endl;
+
+    GaloisField gf(m);
+    RS_Encoder encoder(n, k, gf);
+    RS_Decoder decoder(n, k, gf);
+
+    // Message aléatoire
+    std::vector<int> message(k);
+    for (int i = 0; i < k; ++i) {
+        message[i] = i+1; // Juste pour avoir des valeurs non nulles
     }
+
+    std :: cout << "Message original : " << std::endl;
+    for(auto x : message) std::cout << x << " ";
     std::cout << std::endl;
-    // Encode the message
+    
+    std::vector<int> codeword;
     encoder.encode(message, codeword);
-    std::cout << "Encoded codeword: ";
-    for (int c : codeword) {
-        std::cout << c << " ";
+
+std::cout << "Codeword encodé : " << std::endl;
+
+    for(int i = 0; i < n; ++i) {
+        std::cout << codeword[i] << " ";
     }
+
+    std :: cout << std::endl;
+
+    // Ajout d'erreurs
+    std::vector<int> received = codeword;
+    received[0 + (n - k)] ^= 0xFF;
+    received[1 + (n - k)] ^= 0x55;
+
+    std :: cout << "Message reçu (avec erreurs) : " << std::endl;
+    for(auto x : received) std::cout << x << " ";
     std::cout << std::endl;
-    // Introduce errors in the codeword
-    received = codeword;
-    received[1] = 0; // Introduce an error
-    if (t > 1) {
-        received[2] = 0; // Introduce another error if t > 1
-    }
-    std::cout << "Received codeword with error: ";
-    for (int r : received) {
-        std::cout << r << " ";
-    }
 
-    RS_Decoder decoder(n, k, GF);
-    std::vector<int> decoded_message(k); // To hold the decoded message
-    decoded_message = decoder.decode(received);
-    std::cout << "Decoded message: ";
-    for (int d : decoded_message) {
-        std::cout << d << " ";
-    }
-
-
-    std::cout << std::endl; 
+    // Décodage
+    std::vector<int> decoded= decoder.decode(received);
+    std :: cout << "Message décodé : " << std :: endl ;
+    for(auto x : decoded) std::cout << x << " ";
+    std::cout << std::endl;
 }

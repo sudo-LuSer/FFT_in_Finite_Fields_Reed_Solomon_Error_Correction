@@ -1,7 +1,7 @@
 #include "RS_Encoder.hpp"
 #include <cstring>
+// #include "mipp.h"
 
-#include "mipp.h"
 RS_Encoder::RS_Encoder(int n, int k, const GaloisField &gf)
     : n(n), k(k), GaloisField(gf)
 {

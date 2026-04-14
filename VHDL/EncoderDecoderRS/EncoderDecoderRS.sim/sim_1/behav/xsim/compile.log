@@ -1,3 +1,0 @@
-INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/HP_PC/Desktop/Workspace/Projet thematique/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/VHDL/EncoderDecoderRS/EncoderDecoderRS.srcs/sources_1/new/rs_pkg.vhd" into library xil_defaultlib
-INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/HP_PC/Desktop/Workspace/Projet thematique/FFT_in_Finite_Fields_Reed_Solomon_Error_Correction/VHDL/EncoderDecoderRS/EncoderDecoderRS.srcs/sources_1/new/RS_ENCODER.vhd" into library xil_defaultlib
-INFO: [VRFC 10-3107] analyzing entity 'rs_encoder'

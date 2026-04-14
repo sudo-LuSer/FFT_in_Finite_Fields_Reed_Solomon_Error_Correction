@@ -1,1 +1,0 @@
---incr --debug "typical" --relax --mt "2" -L "xil_defaultlib" -L "secureip" --snapshot "rs_tb_behav" "xil_defaultlib.rs_tb" -log "elaborate.log" 
