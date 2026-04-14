@@ -26,9 +26,9 @@ int main(int argc, char** argv)
     
     // RS(7, 5) => t=1, m=3. Bits 21 -> 15.
     // NOTE: This uses aff3ct B_32 (32-bit integer) template instantiation.
-    const int N_rs = 255;  // Symbols
-    const int K_rs = 239;  // Symbols
-    const int m = 8;       // Bits per symbol
+    const int N_rs = 127;  // Symbols
+    const int K_rs = 121;  // Symbols
+    const int m = 7;       // Bits per symbol
     const int t = (N_rs - K_rs) / 2; // Correction 
     const int N = N_rs * m; // Total bits
     const int K = K_rs * m; // Info bits
