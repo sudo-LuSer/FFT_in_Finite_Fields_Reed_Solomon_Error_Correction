@@ -4,7 +4,7 @@ project(ECC_ReedSolomon)
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories(include
-    /mnt/c/Users/Nasr-allah/Desktop/Mini_Proj_MIPP/include/MIPP/include
+    # /mnt/c/Users/Nasr-allah/Desktop/Mini_Proj_MIPP/include/MIPP/include
 )
 
 add_executable(RS_RUN 
