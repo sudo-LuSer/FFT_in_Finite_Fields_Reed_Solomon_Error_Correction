@@ -13,8 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build and run
-    -run: |
+    - run: |
         cmake -S . -B build
         cmake --build build
         ./build/RS_RUN
