@@ -7,12 +7,16 @@
 
 #include <aff3ct.hpp>
 
+#include "custom/RS_tools.hpp"
+
 #include "custom/Comparator.hpp"
 
 #include "custom/Encoder_RS.hpp"
 #include "custom/Decoder_RS.hpp"
 #include "custom/NTL_ENCODER_RS.hpp"
 #include "custom/error_injector.hpp"
+
+
 
 using namespace spu;
 using namespace spu::module;
@@ -30,8 +34,10 @@ int main(int argc, char** argv)
     const int K_rs = 121;  // Symbols
     const int m = 7;       // Bits per symbol
     const int t = (N_rs - K_rs) / 2; // Correction 
+    const int r = N_rs - K_rs; // Parity symbols
     const int N = N_rs * m; // Total bits
     const int K = K_rs * m; // Info bits
+    GaloisField gf(m);
 
     // aff3ct :: tools :: RS_polynomial_generator R(N_rs, t); 
 
@@ -54,11 +60,12 @@ int main(int argc, char** argv)
     // Create Encoder and Decoder
     aff3ct::module::Encoder_RS<>     encoder(K_rs, N_rs, poly);
     aff3ct::module::Decoder_RS_std<> decoder(K_rs, N_rs, poly);    
+    gf.define_generator(r);
 
-    module :: error_injector error_inj1(N_rs,K_rs,m,2); // Inject up to t-1 errors
-    module :: error_injector error_inj2(N_rs,K_rs,m,2); // Inject up to t-1 errors
-    module::Encoder_RS         encoder_rs(N_rs, K_rs, m);
-    module::Decoder_RS         decoder_rs(N_rs, K_rs, m);
+    module :: error_injector error_inj1(N_rs,K_rs,m,t); // Inject up to t-1 errors
+    module :: error_injector error_inj2(N_rs,K_rs,m,t); // Inject up to t-1 errors
+    module :: Encoder_RS         encoder_rs(N_rs, K_rs, m, gf);
+    module :: Decoder_RS         decoder_rs(N_rs, K_rs, m);
 
     module::NTL_ENCODER_RS         encoder_ntl_rs(N_rs, K_rs, m);
 

@@ -2,7 +2,7 @@
 #include <streampu.hpp>
 #include "RS_Decoder.hpp"
 #include "RS_tools.hpp"
-#include "RS_Encoder.hpp"
+#include "Encoder_RS.hpp"
 
 namespace spu {
 namespace module {

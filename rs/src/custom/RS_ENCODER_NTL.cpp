@@ -39,21 +39,6 @@ void RS_Encoder_NTL::build_generator_polynomial(){
 
 
 NTL::GF2E RS_Encoder_NTL::intToGF2E(int value) const {
-    if (value < 0) {
-        throw std::invalid_argument("Les symboles doivent être non négatifs.");
-    }
-
-    // On suppose que le symbole est codé sur m bits.
-    // Limite pratique pour rester compatible avec int.
-    if (m_ > 30) {
-        throw std::runtime_error("m trop grand pour une conversion sûre vers int.");
-    }
-
-    const int max_symbol = (1 << m_) - 1;
-    if (value > max_symbol) {
-        throw std::invalid_argument("Le symbole est hors de l'intervalle [0, 2^m - 1].");
-    }
-
     NTL::GF2X poly;
     for (int b = 0; b < m_; ++b) {
         if ((value >> b) & 1) {

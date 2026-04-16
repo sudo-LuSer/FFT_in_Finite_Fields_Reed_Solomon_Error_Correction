@@ -4,7 +4,6 @@
 #include <vector>
 #include "RS_Decoder.hpp"
 #include "RS_tools.hpp"
-#include "RS_Encoder.hpp"
 #include <streampu.hpp>
 
 using namespace spu;

@@ -1,9 +1,11 @@
+#pragma once
+
 #ifndef RS_DECODER_HPP
 #define RS_DECODER_HPP
-#define RS_DECODER_HPP
+
 #include <vector>
 #include "RS_tools.hpp"
-#include "RS_Encoder.hpp"
+#include "Encoder_RS.hpp"
 
 class RS_Decoder {
 private:

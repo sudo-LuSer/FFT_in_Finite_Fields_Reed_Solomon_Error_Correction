@@ -24,11 +24,45 @@ GaloisField::GaloisField(int m) : m(m), prim_poly(poly_masks[m]) {
     }
 
     index_of[0] = -1;
+
+}
+
+void GaloisField :: dp_mt(const int r, const std::vector<int>& generator) {
+    mul_table.resize(size * r);
+
+    int* mt = mul_table.data();
+
+    for (int x = 0; x < size; ++x) {
+        for (int j = 0; j < r; ++j) {
+            mt[x * r + j] = mul(x, generator[j]);
+        }
+    }
+}
+
+
+void GaloisField :: define_generator(const int r) {
+    generator.resize(r + 1);
+    generator[0] = 1;
+
+    for (int i = 1; i <= r; ++i) {
+        int alpha_i = alpha_to[i];
+
+        for (int j = i; j > 0; --j) {
+            generator[j] = GF_ADD(generator[j - 1], mul(generator[j], alpha_i));
+        }
+
+        generator[0] = mul(generator[0], alpha_i);
+    }
+
+    dp_mt(r, generator);
 }
 
 int GaloisField::get_m() const { return m; }
 int GaloisField::get_prim_poly() const { return prim_poly; }
 int GaloisField::get_size() const { return size; }
 
+
 const std::vector<int>& GaloisField::get_alpha_to() const { return alpha_to; }
 const std::vector<int>& GaloisField::get_index_of() const { return index_of; }
+const std::vector<int>& GaloisField::get_generator() const { return generator; }
+const std::vector<int>& GaloisField::get_mul_table() const { return mul_table; }
