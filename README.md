@@ -242,28 +242,15 @@ This helps evaluate algorithm efficiency and potential **hardware acceleration o
 
 A simple test in a large base of digital communication circuit can be amusing : 
 
-Message (PC)
-   |
-   | Ethernet
-   v
-Encodeur FPGA (systématique)
-   |
-   | Ethernet
-   v
-ENIGMA ENC FPGA
-   |
-   v
-Injecteur d'erreurs FPGA
-   |
-   v
-ENIGMA DEC FPGA
-   |
-   | Ethernet
-   v
-Décodeur C++
-   |
-   v
-Message d'origine
+```mermaid
+flowchart LR
+    A[Message (PC)] -->|Ethernet| B[Encodeur FPGA (systématique)]
+    B -->|Ethernet| C[ENIGMA ENC FPGA]
+    C --> D[Injecteur d'erreurs FPGA]
+    D --> E[ENIGMA DEC FPGA]
+    E -->|Ethernet| F[Décodeur C++]
+    F --> G[Message d'origine]
+```
 
 Planned extensions include:
 
