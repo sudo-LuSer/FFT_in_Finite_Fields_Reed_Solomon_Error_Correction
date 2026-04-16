@@ -240,15 +240,30 @@ This helps evaluate algorithm efficiency and potential **hardware acceleration o
 
 # Future Work
 
-A simple test in a circuit of simple modulation can be amusing : 
+A simple test in a large base of digital communication circuit can be amusing : 
 
-flowchart LR
-    A[Message (PC)] -->|Ethernet| B[Encodeur FPGA (systématique)]
-    B -->|Ethernet| C[ENIGMA ENC FPGA]
-    C --> D[Injecteur d'erreurs FPGA]
-    D --> E[ENIGMA DEC FPGA]
-    E -->|Ethernet| F[Décodeur C++]
-    F --> G[Message d'origine]
+Message (PC)
+   |
+   | Ethernet
+   v
+Encodeur FPGA (systématique)
+   |
+   | Ethernet
+   v
+ENIGMA ENC FPGA
+   |
+   v
+Injecteur d'erreurs FPGA
+   |
+   v
+ENIGMA DEC FPGA
+   |
+   | Ethernet
+   v
+Décodeur C++
+   |
+   v
+Message d'origine
 
 Planned extensions include:
 
