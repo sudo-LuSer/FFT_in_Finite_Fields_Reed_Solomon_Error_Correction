@@ -16,10 +16,11 @@ projet_ECC/
 ├── doc/                # Documentation (subject,proposition , references)
 ├── include/            # C++ header files (.hpp)
 ├── src/                # C++ source files (.cpp)
-├── rs/                 # Updated files (use them on piriority) 
+├── rs/                 # Updated files (use them on piriority but before you need to install & copy them on your hulotte file and change the CMake then Run) <a href = 'https://github.com/sudo-LuSer/hulotte'>Here myFork of hulotte</a>
 ├── matlab/             # MATLAB validation scripts
 ├── VHDL/               # VHDL implementation for FPGA for simple polynomial
-│
+├── WinNTL              # Number Theory Library for running the NTL version of the encoder
+├── ntl                 # Source of Number theory Lib <a href = 'https://github.com/sudo-LuSer/ntl'>Here myFork of ntl</a>
 └── README.md           # Project documentation
 ```
 
@@ -67,18 +68,20 @@ A **Makefile** is provided at the root of the project.
 ### Linux / macOS
 
 ```bash
-make
+mkdir build && cd build 
+cmake .. 
+make 
 ```
 
 ### Windows (MinGW)
 
 ```bash
-mingw32-make
+mingw32-cmake (I guess else use wsl)
 ```
 
 This generates:
 
-- object files in `obj/`
+- object files in `build/`
 - executable `RS_RUN` (or `RS_RUN.exe`)
 
 ---
