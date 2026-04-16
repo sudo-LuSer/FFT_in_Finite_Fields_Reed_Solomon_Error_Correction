@@ -1,4 +1,5 @@
 #pragma once
+
 #ifndef RS_TOOLS_H
 #define RS_TOOLS_H
 
@@ -15,13 +16,13 @@ class GaloisField {
 private:
     int m;
     int prim_poly;
-
 protected:
     int size;
 
-    std::vector<int> alpha_to;
-    std::vector<int> index_of;
-
+    std :: vector<int> alpha_to;
+    std :: vector<int> index_of;
+    std :: vector<int> generator;
+    std :: vector<int> mul_table;
 public:
     GaloisField(int m);
 
@@ -31,6 +32,10 @@ public:
 
     const std::vector<int>& get_alpha_to() const;
     const std::vector<int>& get_index_of() const;
+    const std::vector<int>& get_mul_table() const;
+    const std::vector<int>& get_generator() const;
+    void define_generator(const int r);
+    void dp_mt(const int r, const std::vector<int>& generator);
 
     // inline ops 
     inline int mul(int a, int b) const {

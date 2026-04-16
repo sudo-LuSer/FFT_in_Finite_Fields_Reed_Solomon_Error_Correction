@@ -8,41 +8,16 @@ RS_Encoder::RS_Encoder(int n, int k, const GaloisField &gf)
     if (n <= k) throw std::invalid_argument("n must be greater than k");
 
     r = n - k;
-    int sz = size;
-
     t = r / 2;
 
-    generator.resize(r + 1, 0);
-    generator[0] = 1;
-
-    for (int i = 1; i <= r; ++i) {
-        int alpha_i = alpha_to[i];
-
-        for (int j = i; j > 0; --j) {
-            generator[j] = GF_ADD(generator[j - 1], mul(generator[j], alpha_i));
-        }
-
-        generator[0] = mul(generator[0], alpha_i);
-    }
-
-    mul_table.resize(size * r);
-
-    int* mt = mul_table.data();
-
-    for (int x = 0; x < size; ++x) {
-        for (int j = 0; j < r; ++j) {
-            mt[x * r + j] = mul(x, generator[j]);
-        }
-    }
-
-    parity.resize(r, 0);
+    parity.resize(r);
 }
 
 void RS_Encoder::encode(const std::vector<int>& message, std::vector<int>& codeword) {
     std::fill(parity.begin(), parity.end(), 0); 
 
     int* __restrict par = parity.data();
-    const int* __restrict mt = mul_table.data();
+    const int* __restrict mt = get_mul_table().data();
     const int* __restrict msg = message.data();
     
     for (int i = k - 1; i >= 0; --i) {

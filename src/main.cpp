@@ -5,14 +5,16 @@
 #include "RS_Decoder.hpp"
 
 int main() {
-    int m = 8;
-    int n = 255;
-    int k = 239;
+    int m = 3;
+    int n  = (1 << m) - 1;
+    int k = 3;
     int t = (n - k) / 2;
 
     std::cout << "RS(" << n << ", " << k << ") code, t = " << t << std::endl;
 
     GaloisField gf(m);
+    gf.define_generator(n - k);
+
     RS_Encoder encoder(n, k, gf);
     RS_Decoder decoder(n, k, gf);
 
@@ -39,8 +41,8 @@ std::cout << "Codeword encodé : " << std::endl;
 
     // Ajout d'erreurs
     std::vector<int> received = codeword;
-    received[0 + (n - k)] ^= 0xFF;
-    received[1 + (n - k)] ^= 0x55;
+    received[0 + (n - k)] = 0;
+    received[1] = 0;
 
     std :: cout << "Message reçu (avec erreurs) : " << std::endl;
     for(auto x : received) std::cout << x << " ";

@@ -115,7 +115,7 @@ int main(int argc, char** argv)
     sequence.export_dot(file);
 
     // Run the sequence
-    for (auto i = 0; i < 1000; i++)
+    for (auto i = 0; i < 10000; i++)
         sequence.exec_seq(); // Run 1 frame at a time
 
     // 5. Stats
