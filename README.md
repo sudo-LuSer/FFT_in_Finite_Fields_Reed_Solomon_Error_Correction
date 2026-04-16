@@ -244,12 +244,12 @@ A simple test in a large base of digital communication circuit can be amusing :
 
 ```mermaid
 flowchart LR
-    A[Message (PC)] -->|Ethernet| B[Encodeur FPGA (systématique)]
-    B -->|Ethernet| C[ENIGMA ENC FPGA]
-    C --> D[Injecteur d'erreurs FPGA]
-    D --> E[ENIGMA DEC FPGA]
-    E -->|Ethernet| F[Décodeur C++]
-    F --> G[Message d'origine]
+    A["Message (PC)"] -->|Ethernet| B["Encodeur FPGA (systématique)"]
+    B -->|Ethernet| C["ENIGMA ENC FPGA"]
+    C --> D["Injecteur d'erreurs FPGA"]
+    D --> E["ENIGMA DEC FPGA"]
+    E -->|Ethernet| F["Décodeur C++"]
+    F --> G["Message d'origine"]
 ```
 
 Planned extensions include:
