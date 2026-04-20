@@ -245,11 +245,11 @@ A simple test in a large base of digital communication circuit can be amusing :
 ```mermaid
 flowchart LR
     A["Message (PC)"] -->|Ethernet| B["ENIGMA ENC FPGA"]
-    B --> C["Encodeur_RS"]
-    C --> D["Injecteur d'erreurs"]
-    D --> E["ENIGMA DEC"]
-    E -->|Ethernet| F["Décodeur C++"]
-    F --> G["Message d'origine"]
+    B --> C["Encodeur_RS FPGA"]
+    C --> D["Injecteur d'erreurs FPGA"]
+    D --> |Ethernet| E["Décodeur C++"]
+    E --> |Ethernet| F["ENIGMA DEC FPGA"]
+    F --> |Ethernet| G["Message d'origine PC"]
 ```
 
 Planned extensions include:
