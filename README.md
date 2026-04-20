@@ -244,10 +244,10 @@ A simple test in a large base of digital communication circuit can be amusing :
 
 ```mermaid
 flowchart LR
-    A["Message (PC)"] -->|Ethernet| B["Encodeur FPGA (systématique)"]
-    B -->|Ethernet| C["ENIGMA ENC FPGA"]
-    C --> D["Injecteur d'erreurs FPGA"]
-    D --> E["ENIGMA DEC FPGA"]
+    A["Message (PC)"] -->|Ethernet| B["ENIGMA ENC FPGA"]
+    B -->|Ethernet| C["Encodeur_RS"]
+    C --> D["Injecteur d'erreurs"]
+    D --> E["ENIGMA DEC"]
     E -->|Ethernet| F["Décodeur C++"]
     F --> G["Message d'origine"]
 ```
