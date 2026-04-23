@@ -32,39 +32,3 @@ void RS_Encoder::encode(const std::vector<int>& message, std::vector<int>& codew
     std::memcpy(codeword.data(), par, r * sizeof(int));
     std::memcpy(codeword.data() + r, msg, k * sizeof(int));
 }
-
-// void RS_Encoder::encode(const std::vector<int>& message,
-//                         std::vector<int>& codeword)
-// {
-//     constexpr int N = mipp::N<int>();
-//     int* __restrict par = parity.data();
-//     const int* __restrict mt = mul_table.data();
-//     const int* __restrict msg = message.data();
-
-//     for (int i = 0; i < k; ++i) {
-//         int feedback = msg[i] ^ par[0];
-
-//         for (int j = 0; j < r - 1; ++j)
-//             par[j] = par[j + 1];
-//         par[r - 1] = 0;
-
-//         if (feedback) {
-//             const int* row = mt + feedback * r;
-//             int j = 0;
-//             for (int vec_end = (r / N) * N; j < vec_end; j += N) {
-//                 mipp::Reg<int> p(&par[j]);
-//                 mipp::Reg<int> rw(&row[j]);
-//                 p ^= rw;
-//                 p.store(&par[j]);
-//             }
-//             for (; j < r; ++j)
-//                 par[j] ^= row[j];
-//         }
-//     }
-
-//     codeword.resize(n);
-//     // std::copy(par, par + r, codeword.begin());
-//     // std::copy(message.begin(), message.end(), codeword.begin() + r);
-//     std::memcpy(codeword.data(), par, r * sizeof(int));
-//     std::memcpy(codeword.data() + r, msg, k * sizeof(int));
-// }

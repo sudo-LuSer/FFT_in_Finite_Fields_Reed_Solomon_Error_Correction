@@ -1,0 +1,11 @@
+# compile vhdl design source files
+vhdl xil_defaultlib  \
+"../../../../rs_enc.srcs/sources_1/imports/src_vhdl/CodeWord.vhd" \
+"../../../../rs_enc.srcs/sources_1/imports/src_vhdl/rs_pkg.vhd" \
+"../../../../rs_enc.srcs/sources_1/imports/src_vhdl/RS_ENCODER.vhd" \
+"../../../../rs_enc.srcs/sources_1/imports/src_vhdl/pc_rs.vhd" \
+"../../../../rs_enc.srcs/sources_1/imports/src_vhdl/rsenc_top_level.vhd" \
+"../../../../rs_enc.srcs/sim_1/imports/src_vhdl/tb_rs_encoder.vhd" \
+
+# Do not sort compile order
+nosort
