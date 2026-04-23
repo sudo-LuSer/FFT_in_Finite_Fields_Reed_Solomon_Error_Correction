@@ -240,13 +240,25 @@ This helps evaluate algorithm efficiency and potential **hardware acceleration o
 
 # Future Work
 
+A simple test in a large base of digital communication circuit can be amusing : 
+
+```mermaid
+flowchart LR
+    A["Message (PC)"] -->|Ethernet| B["ENIGMA ENC FPGA"]
+    B --> C["Encodeur_RS FPGA"]
+    C --> D["Injecteur d'erreurs FPGA"]
+    D --> |Ethernet| E["Décodeur C++"]
+    E --> |Ethernet| F["ENIGMA DEC FPGA"]
+    F --> |Ethernet| G["Message d'origine PC"]
+```
+
 Planned extensions include:
 
-- Implementation of **FFT over finite fields**
-- **VHDL hardware implementation**
-- Integration into a **RISC-V processor**
-- FPGA deployment and benchmarking
-- Support for larger codes (e.g. **RS(255,223)**)
+- Implementation of **FFT over finite fields** : Impossible because n = 1 << m -1 so doesn't work 
+- **VHDL hardware implementation** : We have already a hardware encoder 
+- Integration into a **RISC-V processor** : I have no idea how 
+- FPGA deployment and benchmarking : the circuit above may be very amusing 
+- Support for larger codes (e.g. **RS(255,223)**) : our encodec can support to : 2^20 so very performative
 
 ---
 
