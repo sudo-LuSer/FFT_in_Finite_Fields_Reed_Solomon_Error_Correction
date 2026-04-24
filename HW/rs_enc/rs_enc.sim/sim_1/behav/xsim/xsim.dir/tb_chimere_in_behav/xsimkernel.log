@@ -1,4 +1,0 @@
-Running: xsim.dir/tb_chimere_in_behav/xsimk.exe -simmode gui -wdb tb_chimere_in_behav.wdb -simrunnum 0 -socket 58466
-Design successfully loaded
-Design Loading Memory Usage: 7416 KB (Peak: 7416 KB)
-Design Loading CPU Usage: 15 ms
