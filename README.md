@@ -14,13 +14,13 @@ Reed–Solomon codes are widely used in **digital communication and storage syst
 projet_ECC/
 │
 ├── doc/                # Documentation (subject,proposition , references)
-├── include/            # C++ header files (.hpp)
-├── src/                # C++ source files (.cpp)
-├── rs/                 # Updated files (use them on piriority but before you need to install & copy them on your hulotte file and change the CMake then Run) <a href = 'https://github.com/sudo-LuSer/hulotte'>Here myFork of hulotte</a>
-├── matlab/             # MATLAB validation scripts
-├── VHDL/               # VHDL implementation for FPGA for simple polynomial
-├── WinNTL              # Number Theory Library for running the NTL version of the encoder
-├── ntl                 # Source of Number theory Lib <a href = 'https://github.com/sudo-LuSer/ntl'>Here myFork of ntl</a>
+├── SW/ 
+      ── include/            # C++ header files (.hpp)
+      ── src/                # C++ source files (.cpp)
+      ── rs/                 # Updated files (use them on piriority but before you need to install & copy them on your hulotte file and change the CMake then Run) <a href = 'https://github.com/sudo-LuSer/hulotte'>Here myFork of hulotte</a>
+      ── matlab/             # MATLAB validation scripts
+├── HW/ 
+      ── rs_enc/               # VHDL implementation for FPGA for simple polynomial & extensions to CHIMERE
 └── README.md           # Project documentation
 ```
 
