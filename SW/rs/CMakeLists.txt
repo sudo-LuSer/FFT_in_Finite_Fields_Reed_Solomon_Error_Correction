@@ -8,9 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # DEPENDENCIES
 # ============================================================
 
-set(STREAMPU_ROOT "/mnt/c/Users/Nasr-allah/Desktop/hulotte/streampu" CACHE PATH "Path to StreamPU")
-
-set(AFF3CT_ROOT "/mnt/c/Users/Nasr-allah/Desktop/hulotte/aff3ct" CACHE PATH "Path to AFF3CT")
+set(AFF3CT_ROOT $ENV{AFF3CT_ROOT} CACHE PATH "Path to AFF3CT")
+set(STREAMPU_ROOT $ENV{STREAMPU_ROOT} CACHE PATH "Path to StreamPU")
 
 
 
