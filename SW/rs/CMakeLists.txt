@@ -107,5 +107,5 @@ endif()
 
 # Main executable
 add_executable(rs src/main.cpp)
-target_link_libraries(rs ${HULOTTE_LIBS} ${CUSTOM_MODULE_LIBS} ntl gmp)
+target_link_libraries(rs ${HULOTTE_LIBS} ${CUSTOM_MODULE_LIBS})
 
