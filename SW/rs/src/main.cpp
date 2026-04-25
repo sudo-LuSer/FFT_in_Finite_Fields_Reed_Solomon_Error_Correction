@@ -13,7 +13,6 @@
 
 #include "custom/Encoder_RS.hpp"
 #include "custom/Decoder_RS.hpp"
-#include "custom/NTL_ENCODER_RS.hpp"
 #include "custom/error_injector.hpp"
 
 
@@ -66,8 +65,6 @@ int main(int argc, char** argv)
     module :: error_injector error_inj2(N_rs,K_rs,m,t); // Inject up to t-1 errors
     module :: Encoder_RS         encoder_rs(N_rs, K_rs, m, gf);
     module :: Decoder_RS         decoder_rs(N_rs, K_rs, m);
-
-    module::NTL_ENCODER_RS         encoder_ntl_rs(N_rs, K_rs, m);
 
     // 2. Sockets binding
     using namespace aff3ct::module;
