@@ -29,8 +29,7 @@ public:
 
     inline int mul(int a, int b) const {
         if (a == 0 || b == 0) return 0;
-        if (a < 0 || a >= size || b < 0 || b >= size)
-            throw std::invalid_argument("GF element out of range");
+        // Hot-path operation: callers must pass valid field elements.
         return alpha_to[(index_of[a] + index_of[b]) % (size - 1)];
     }
     inline int div(int a, int b) const {
