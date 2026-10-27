@@ -6,9 +6,15 @@ const uint32_t poly_masks[21] = {
     0x8003,0x1100B,0x80009,0x100065,0x200009,0x800021
 };
 
-GaloisField::GaloisField(int m) : m(m), prim_poly(poly_masks[m]) {
+namespace {
+int checked_primitive_polynomial(int m) {
     if (m < 2 || m > 20)
         throw std::invalid_argument("m must be between 2 and 20");
+    return static_cast<int>(poly_masks[m]);
+}
+}
+
+GaloisField::GaloisField(int m) : m(m), prim_poly(checked_primitive_polynomial(m)) {
 
     size = 1 << m;
 
