@@ -24,3 +24,12 @@ jobs:
       - name: Test
         working-directory: ${{ github.workspace }}/SW/build
         run: ctest -C ${{ env.BUILD_TYPE }}
+
+      - name: Configure standalone RS decoder tests
+        run: cmake -S ${{ github.workspace }}/SW/rs/tests -B ${{ github.workspace }}/SW/rs/tests/build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+      - name: Build standalone RS decoder tests
+        run: cmake --build ${{ github.workspace }}/SW/rs/tests/build --config ${{ env.BUILD_TYPE }}
+
+      - name: Run standalone RS decoder tests
+        run: ctest --test-dir ${{ github.workspace }}/SW/rs/tests/build -C ${{ env.BUILD_TYPE }} --output-on-failure

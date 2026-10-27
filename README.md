@@ -294,3 +294,38 @@ Supervisor:
 # License
 
 This project is intended for **academic and research purposes**.
+
+
+## Algebraic RS decoder and finite-field FFT
+
+The C++ decoder in `SW/rs/src/custom/RS_Decoder.cpp` and the standalone
+copy in `SW/src/RS_Decoder.cpp` use syndrome computation, Berlekamp–Massey,
+Chien search and Forney magnitudes. The decoder supports up to
+`floor((n-k)/2)` unknown symbol errors and verifies all syndromes after
+correction. Use `try_decode(received, corrected)` to receive a failure status;
+`decode(received)` throws if correction cannot be verified.
+
+Two generator-root conventions are supported:
+- `first_root = 1` (roots `alpha^1 ... alpha^(n-k)`), the default matching
+  the custom `GaloisField::define_generator` encoder.
+- `first_root = 0` (roots `alpha^0 ... alpha^(n-k-1)`), matching the
+  alternate `RS_Encoder_NTL` convention. The StreamPU wrapper accepts this
+  as its fourth argument: `Decoder_RS(n, k, m, 0)`.
+
+For full-length codes `n = 2^m-1` whose multiplicative group order factors into
+small radices, a mixed-radix finite-field FFT can evaluate syndromes and
+perform Chien search. It transforms over the code's own `GF(2^m)`; it is not
+an unrelated prime-modulus NTT. Short or unsuitable cases use direct algebraic
+kernels. This path is conditional and should be benchmarked for each target.
+
+### Decoder tests
+
+The tests build without AFF3CT/StreamPU and check both source layouts, zero to
+maximum correctable errors, odd/even redundancy, both root conventions, and a
+large full-length code that exercises the transform path:
+
+```bash
+cmake -S SW/rs/tests -B build-rs-tests -DCMAKE_BUILD_TYPE=Release
+cmake --build build-rs-tests -j
+ctest --test-dir build-rs-tests --output-on-failure
+```
